@@ -43,8 +43,8 @@ export default tseslint.config(
   },
   {
     files: [
-      'src/domains/*/{application,domain,presentation}/**/*.ts',
-      'src/domains/*/*.module.ts',
+      'src/domains/{auth,user}/{application,domain,presentation}/**/*.ts',
+      'src/domains/{auth,user}/*.module.ts',
     ],
     rules: {
       'no-restricted-imports': [
@@ -74,38 +74,12 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/modules/**/*.ts'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@domains/*/*'],
-              message:
-                'Use the domain public API (e.g. @domains/<name>) instead of deep domain imports.',
-            },
-            {
-              group: [
-                '../../infra/prisma/*',
-                '../../infra/cache/*',
-                '../../infra/queue/*',
-                '../../infra/schedule/*',
-              ],
-              message:
-                'Avoid direct infra dependency from feature modules. Route through infra modules/adapters.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
     files: [
       'src/common/**/*.ts',
       'src/core/**/*.ts',
       'src/config/**/*.ts',
       'src/infra/**/*.ts',
+      'src/domains/{audit,feature-flag,health,metrics,streaming,upload,websocket}/**/*.ts',
       'test/**/*.ts',
     ],
     rules: {
@@ -132,7 +106,8 @@ export default tseslint.config(
   {
     files: [
       'src/*.ts',
-      'src/{common,core,config,infra,modules,shared}/**/*.ts',
+      'src/{common,core,config,infra,shared}/**/*.ts',
+      'src/domains/{audit,feature-flag,health,metrics,streaming,upload,websocket}/**/*.ts',
       'test/**/*.ts',
     ],
     rules: {

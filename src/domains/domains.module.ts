@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from '@domains/user';
 import { AuthModule } from '@domains/auth';
-import { HealthModule } from '../modules/health/health.module';
-import { UploadModule } from '../modules/upload/upload.module';
-import { StreamingModule } from '../modules/streaming/streaming.module';
-import { WebsocketModule } from '../modules/websocket/websocket.module';
-import { AuditModule } from '../modules/audit/audit.module';
-import { FeatureFlagModule } from '../modules/feature-flag/feature-flag.module';
+import { HealthModule } from '@domains/health';
+import { UploadModule } from '@domains/upload';
+import { StreamingModule } from '@domains/streaming';
+import { WebsocketModule } from '@domains/websocket';
+import { AuditModule } from '@domains/audit';
+import { FeatureFlagModule } from '@domains/feature-flag';
 
 @Module({
   imports: [

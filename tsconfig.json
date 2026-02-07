@@ -20,7 +20,6 @@
       "@shared/*": ["src/shared/*"],
       "@infra/*": ["src/infra/*"],
       "@domains/*": ["src/domains/*"],
-      "@modules/*": ["src/modules/*"],
       "@common/*": ["src/common/*"],
       "@config/*": ["src/config/*"]
     },

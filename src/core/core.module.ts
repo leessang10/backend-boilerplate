@@ -11,7 +11,7 @@ import { validateEnv } from '../config/env.validation';
 import databaseConfig from '../config/database.config';
 import redisConfig from '../config/redis.config';
 import jwtConfig from '../config/jwt.config';
-import { MetricsModule } from '../modules/metrics/metrics.module';
+import { MetricsModule } from '@domains/metrics';
 
 @Module({
   imports: [

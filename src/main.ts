@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import { AppModule } from './app.module';
+import { AppModule } from './app/app.module';
 import { HttpExceptionFilter } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
 import { RequestIdMiddleware } from './core/middlewares/request-id.middleware';
@@ -122,4 +122,4 @@ async function bootstrap() {
   console.log(`📚 Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 
-bootstrap();
+void bootstrap();
