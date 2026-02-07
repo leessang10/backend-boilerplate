@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { UserModule } from '@domains/user';
 import { AuthService } from './application/auth.service';
 import { AuthController } from './presentation/auth.controller';
-import { UserModule } from '../user/user.module';
+import { AuthRepository } from './infrastructure/auth.repository';
 import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './infrastructure/strategies/jwt-refresh.strategy';
 
@@ -14,7 +15,7 @@ import { JwtRefreshStrategy } from './infrastructure/strategies/jwt-refresh.stra
     JwtModule.register({}), // Config is provided per-token in service
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
+  providers: [AuthService, AuthRepository, JwtStrategy, JwtRefreshStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

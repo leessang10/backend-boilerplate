@@ -1,7 +1,7 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
-import { PrismaService } from '../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 
 @Injectable()
 export class FeatureFlagService {
@@ -108,7 +108,12 @@ export class FeatureFlagService {
   /**
    * Create a feature flag
    */
-  async create(key: string, name: string, description?: string, enabled = false) {
+  async create(
+    key: string,
+    name: string,
+    description?: string,
+    enabled = false,
+  ) {
     const feature = await this.prisma.featureFlag.create({
       data: {
         key,
@@ -158,7 +163,7 @@ export class FeatureFlagService {
   /**
    * Clear feature flag cache
    */
-  async clearCache(): Promise<void> {
+  clearCache(): void {
     // This is a simple implementation
     // In production with Redis, you might want to use pattern matching
     this.logger.log('Feature flag cache cleared');

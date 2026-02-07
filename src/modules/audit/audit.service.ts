@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../infra/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '@infra/prisma/prisma.service';
 import { PaginationMeta } from '../../shared/interfaces/response.interface';
 
 interface QueryAuditDto {
@@ -19,7 +20,7 @@ export class AuditService {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {};
+    const where: Prisma.AuditLogWhereInput = {};
 
     if (userId) {
       where.userId = userId;

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { UserLoginEvent, UserLogoutEvent } from '../auth.events';
+import { UserLoginEvent, UserLogoutEvent } from '@domains/auth';
 import { QueueService } from '../../queue/queue.service';
 
 @Injectable()
@@ -20,13 +20,15 @@ export class UserNotificationHandler {
         title: 'New Login',
         message: `New login detected from ${event.ipAddress || 'unknown IP'}`,
       });
-    } catch (error) {
-      this.logger.error(`Failed to queue login notification: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to queue login notification: ${errorMessage}`);
     }
   }
 
   @OnEvent('user.logout')
-  async handleUserLogout(event: UserLogoutEvent) {
+  handleUserLogout(event: UserLogoutEvent) {
     this.logger.log(`User ${event.email} logged out`);
     // Could add analytics tracking here
   }

@@ -31,7 +31,7 @@ export class UserController {
   }
 
   @Get('me')
-  getProfile(@CurrentUser() user: any) {
+  getProfile(@CurrentUser() user: { id: string }) {
     return this.userService.findOne(user.id);
   }
 

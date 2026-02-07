@@ -7,18 +7,16 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PrismaService } from '../../../infra/prisma/prisma.service';
+import { User } from '@prisma/client';
+import { USER_READER_PORT, UserResponseDto } from '@domains/user';
+import type { UserReaderPort } from '@domains/user';
 import { LoginDto } from '../presentation/dto/login.dto';
 import { AuthResponseDto } from '../presentation/dto/auth-response.dto';
-import { UserResponseDto } from '../../user/presentation/dto/user-response.dto';
-import {
-  UserLoginEvent,
-  UserLogoutEvent,
-} from '../../../infra/events/auth.events';
+import { UserLoginEvent, UserLogoutEvent } from '../domain/events/auth.events';
+import type { AuthJwtConfig } from '../domain/types/jwt-config.type';
 import * as argon2 from 'argon2';
 import { CryptoService } from '../../../common/crypto/crypto.service';
-import { USER_READER_PORT } from '../../user/domain/ports/user-reader.port';
-import type { UserReaderPort } from '../../user/domain/ports/user-reader.port';
+import { AuthRepository } from '../infrastructure/auth.repository';
 
 export interface JwtPayload {
   sub: string;
@@ -31,12 +29,12 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
     @Inject(USER_READER_PORT) private readonly userReader: UserReaderPort,
-    private jwtService: JwtService,
-    private configService: ConfigService,
-    private crypto: CryptoService,
-    private eventEmitter: EventEmitter2,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    private readonly crypto: CryptoService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
@@ -92,16 +90,14 @@ export class AuthService {
   async refresh(refreshToken: string): Promise<AuthResponseDto> {
     try {
       // Verify refresh token
-      const jwtConfig = this.configService.get('jwt');
-      const payload = this.jwtService.verify(refreshToken, {
+      const jwtConfig = this.getJwtConfig();
+      this.jwtService.verify(refreshToken, {
         secret: jwtConfig.refresh.secret,
       });
 
       // Find refresh token in database
-      const storedToken = await this.prisma.refreshToken.findUnique({
-        where: { token: refreshToken },
-        include: { user: true },
-      });
+      const storedToken =
+        await this.authRepository.findRefreshTokenWithUser(refreshToken);
 
       if (!storedToken || storedToken.expiresAt < new Date()) {
         throw new UnauthorizedException('Invalid or expired refresh token');
@@ -116,9 +112,7 @@ export class AuthService {
       const tokens = await this.generateTokens(storedToken.user);
 
       // Delete old refresh token
-      await this.prisma.refreshToken.delete({
-        where: { token: refreshToken },
-      });
+      await this.authRepository.deleteRefreshToken(refreshToken);
 
       // Save new refresh token
       await this.saveRefreshToken(storedToken.user.id, tokens.refreshToken);
@@ -138,31 +132,18 @@ export class AuthService {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       };
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
 
   async logout(userId: string, refreshToken?: string): Promise<void> {
-    if (refreshToken) {
-      // Delete specific refresh token
-      await this.prisma.refreshToken.deleteMany({
-        where: {
-          userId,
-          token: refreshToken,
-        },
-      });
-    } else {
-      // Delete all refresh tokens for user
-      await this.prisma.refreshToken.deleteMany({
-        where: { userId },
-      });
-    }
+    await this.authRepository.deleteRefreshTokens(userId, refreshToken);
 
     this.logger.log(`User logged out: ${userId}`);
 
     // Get user email for event
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.authRepository.findUserById(userId);
     if (user) {
       this.eventEmitter.emit(
         'user.logout',
@@ -172,9 +153,9 @@ export class AuthService {
   }
 
   private async generateTokens(
-    user: any,
+    user: Pick<User, 'id' | 'email' | 'role'>,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const jwtConfig = this.configService.get('jwt');
+    const jwtConfig = this.getJwtConfig();
 
     const payload: JwtPayload = {
       sub: user.id,
@@ -197,19 +178,22 @@ export class AuthService {
   }
 
   private async saveRefreshToken(userId: string, token: string): Promise<void> {
-    const jwtConfig = this.configService.get('jwt');
+    const jwtConfig = this.getJwtConfig();
     const expiresIn = jwtConfig.refresh.expiresIn;
+    if (typeof expiresIn !== 'string') {
+      throw new Error('Refresh token expiration must be a string like 7d');
+    }
 
     // Parse expiration (e.g., '7d' -> 7 days)
-    const match = expiresIn.match(/^(\d+)([dhms])$/);
+    const match = /^(\d+)([dhms])$/.exec(expiresIn);
     if (!match) {
       throw new Error('Invalid refresh token expiration format');
     }
 
-    const value = parseInt(match[1]);
-    const unit = match[2];
+    const value = Number.parseInt(match[1], 10);
+    const unit = match[2] as 'd' | 'h' | 'm' | 's';
 
-    let expiresAt = new Date();
+    const expiresAt = new Date();
     switch (unit) {
       case 'd':
         expiresAt.setDate(expiresAt.getDate() + value);
@@ -225,24 +209,24 @@ export class AuthService {
         break;
     }
 
-    await this.prisma.refreshToken.create({
-      data: {
-        token,
-        userId,
-        expiresAt,
-      },
-    });
+    await this.authRepository.createRefreshToken(userId, token, expiresAt);
   }
 
   async validateUser(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const user = await this.authRepository.findUserById(userId);
 
     if (!user || !user.isActive) {
       return null;
     }
 
     return user;
+  }
+
+  private getJwtConfig(): AuthJwtConfig {
+    const jwtConfig = this.configService.get<AuthJwtConfig>('jwt');
+    if (!jwtConfig) {
+      throw new Error('JWT configuration is missing');
+    }
+    return jwtConfig;
   }
 }

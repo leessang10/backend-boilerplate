@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { FeatureFlagService } from '../feature-flag.service';
 
@@ -12,10 +17,10 @@ export class FeatureFlagGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const featureKey = this.reflector.getAllAndOverride<string>(FEATURE_FLAG_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const featureKey = this.reflector.getAllAndOverride<string>(
+      FEATURE_FLAG_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!featureKey) {
       // No feature flag specified, allow access

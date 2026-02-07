@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
+import { UserModule } from '@domains/user';
+import { AuthModule } from '@domains/auth';
 import { HealthModule } from '../modules/health/health.module';
 import { UploadModule } from '../modules/upload/upload.module';
 import { StreamingModule } from '../modules/streaming/streaming.module';

@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService, JwtPayload } from '../../application/auth.service';
+import type { AuthJwtConfig } from '../../domain/types/jwt-config.type';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -13,7 +14,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
     private configService: ConfigService,
     private authService: AuthService,
   ) {
-    const jwtConfig = configService.get('jwt');
+    const jwtConfig = configService.get<AuthJwtConfig>('jwt');
+    if (!jwtConfig) {
+      throw new Error('JWT configuration is missing');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       ignoreExpiration: false,

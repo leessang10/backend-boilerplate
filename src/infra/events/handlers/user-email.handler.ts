@@ -4,7 +4,7 @@ import {
   UserCreatedEvent,
   UserPasswordChangedEvent,
   UserDeletedEvent,
-} from '../user.events';
+} from '@domains/user';
 import { QueueService } from '../../queue/queue.service';
 
 @Injectable()
@@ -24,8 +24,10 @@ export class UserEmailHandler {
         body: `Hello! Your account has been created successfully. Your user ID is: ${event.userId}`,
         template: 'welcome',
       });
-    } catch (error) {
-      this.logger.error(`Failed to queue welcome email: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to queue welcome email: ${errorMessage}`);
     }
   }
 
@@ -40,8 +42,12 @@ export class UserEmailHandler {
         body: 'Your password has been changed successfully. If you did not make this change, please contact support immediately.',
         template: 'password-changed',
       });
-    } catch (error) {
-      this.logger.error(`Failed to queue password change email: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to queue password change email: ${errorMessage}`,
+      );
     }
   }
 
@@ -56,8 +62,12 @@ export class UserEmailHandler {
         body: 'Your account has been deleted. We are sorry to see you go.',
         template: 'account-deleted',
       });
-    } catch (error) {
-      this.logger.error(`Failed to queue account deletion email: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Failed to queue account deletion email: ${errorMessage}`,
+      );
     }
   }
 }

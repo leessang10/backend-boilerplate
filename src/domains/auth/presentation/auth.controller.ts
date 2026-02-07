@@ -47,7 +47,10 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@Req() req: any, @Body() body?: { refreshToken?: string }) {
+  async logout(
+    @Req() req: { user: { id: string } },
+    @Body() body?: { refreshToken?: string },
+  ) {
     await this.authService.logout(req.user.id, body?.refreshToken);
   }
 }
