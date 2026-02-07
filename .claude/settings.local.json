@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm rebuild:*)",
+      "Bash(npx prisma init:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(pnpm build:*)"
+    ]
+  }
+}
