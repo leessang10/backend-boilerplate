@@ -60,10 +60,10 @@ export default tseslint.config(
           patterns: [
             {
               group: [
-                '../../prisma/*',
-                '../../cache/*',
-                '../../queue/*',
-                '../../schedule/*',
+                '../../infra/prisma/*',
+                '../../infra/cache/*',
+                '../../infra/queue/*',
+                '../../infra/schedule/*',
               ],
               message:
                 'Avoid direct infra dependency from feature modules. Route through infra modules/adapters.',

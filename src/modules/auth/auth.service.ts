@@ -2,12 +2,12 @@ import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { UserResponseDto } from '../user/dto/user-response.dto';
-import { UserLoginEvent, UserLogoutEvent } from '../../common/events/auth.events';
+import { UserLoginEvent, UserLogoutEvent } from '../../infra/events/auth.events';
 import * as argon2 from 'argon2';
 import { CryptoService } from '../../common/crypto/crypto.service';
 

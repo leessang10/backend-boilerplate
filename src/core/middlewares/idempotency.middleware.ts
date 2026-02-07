@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware, Logger, HttpStatus } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { Reflector } from '@nestjs/core';
 
 export const IDEMPOTENT = 'idempotent';

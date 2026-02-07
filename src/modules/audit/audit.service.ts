@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { PaginationMeta } from '../../common/interfaces/response.interface';
+import { PrismaService } from '../../infra/prisma/prisma.service';
+import { PaginationMeta } from '../../shared/interfaces/response.interface';
 
 interface QueryAuditDto {
   page: number;

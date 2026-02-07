@@ -5,7 +5,7 @@ import {
   UserPasswordChangedEvent,
   UserDeletedEvent,
 } from '../user.events';
-import { QueueService } from '../../../queue/queue.service';
+import { QueueService } from '../../queue/queue.service';
 
 @Injectable()
 export class UserEmailHandler {

@@ -5,11 +5,11 @@ import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { RequestIdMiddleware } from './common/middlewares/request-id.middleware';
-import { IdempotencyMiddleware } from './common/middlewares/idempotency.middleware';
-import { PrismaService } from './prisma/prisma.service';
+import { HttpExceptionFilter } from './core/filters/http-exception.filter';
+import { TransformInterceptor } from './core/interceptors/transform.interceptor';
+import { RequestIdMiddleware } from './core/middlewares/request-id.middleware';
+import { IdempotencyMiddleware } from './core/middlewares/idempotency.middleware';
+import { PrismaService } from './infra/prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

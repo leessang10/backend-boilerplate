@@ -8,7 +8,7 @@ import {
 } from '@nestjs/terminus';
 import { parse } from 'node:path';
 import { Public } from '../../common/decorators/public.decorator';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 
 @Controller({ path: 'health', version: '1' })
 export class HealthController {

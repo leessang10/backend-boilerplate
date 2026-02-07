@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { UserEmailHandler } from './handlers/user-email.handler';
 import { UserNotificationHandler } from './handlers/user-notification.handler';
-import { QueueModule } from '../../queue/queue.module';
+import { QueueModule } from '../queue/queue.module';
 
 @Module({
   imports: [

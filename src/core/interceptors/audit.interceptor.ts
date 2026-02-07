@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../infra/prisma/prisma.service';
 import { Reflector } from '@nestjs/core';
 
 export const SKIP_AUDIT = 'skipAudit';

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { MaskUtil } from '../utils/mask.util';
+import { MaskUtil } from '../../shared/utils/mask.util';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {

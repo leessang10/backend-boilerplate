@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UserLoginEvent, UserLogoutEvent } from '../auth.events';
-import { QueueService } from '../../../queue/queue.service';
+import { QueueService } from '../../queue/queue.service';
 
 @Injectable()
 export class UserNotificationHandler {
