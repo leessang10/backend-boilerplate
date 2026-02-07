@@ -91,7 +91,9 @@ export class CleanupTask {
 
       this.logger.log(`Cleaned up ${result.count} expired idempotency keys`);
     } catch (error) {
-      this.logger.error(`Failed to cleanup expired idempotency keys: ${error.message}`);
+      this.logger.error(
+        `Failed to cleanup expired idempotency keys: ${error.message}`,
+      );
     }
   }
 }

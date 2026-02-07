@@ -42,7 +42,9 @@ export class IdempotencyMiddleware implements NestMiddleware {
             where: { key: idempotencyKey },
           });
 
-          this.logger.debug(`Expired idempotency key deleted: ${idempotencyKey}`);
+          this.logger.debug(
+            `Expired idempotency key deleted: ${idempotencyKey}`,
+          );
         } else {
           // Key is still valid, return cached response
           this.logger.log(`Duplicate request detected: ${idempotencyKey}`);
@@ -94,7 +96,9 @@ export class IdempotencyMiddleware implements NestMiddleware {
             this.logger.debug(`Idempotency key stored: ${idempotencyKey}`);
           }
         } catch (error) {
-          this.logger.error(`Failed to store idempotency key: ${error.message}`);
+          this.logger.error(
+            `Failed to store idempotency key: ${error.message}`,
+          );
         }
       });
 

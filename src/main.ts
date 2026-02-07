@@ -1,5 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { RequestMethod, VERSION_NEUTRAL, ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+  RequestMethod,
+  VERSION_NEUTRAL,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -28,7 +33,9 @@ async function bootstrap() {
   // Get ConfigService
   const configService = app.get(ConfigService);
   const port = configService.get('PORT', 3000);
-  const corsOrigin = configService.get('CORS_ORIGIN', 'http://localhost:3000').split(',');
+  const corsOrigin = configService
+    .get('CORS_ORIGIN', 'http://localhost:3000')
+    .split(',');
 
   // Use Pino logger
   app.useLogger(app.get(Logger));
@@ -41,7 +48,12 @@ async function bootstrap() {
     origin: corsOrigin,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID', 'Idempotency-Key'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Request-ID',
+      'Idempotency-Key',
+    ],
     exposedHeaders: ['X-Request-ID'],
   });
 
@@ -87,7 +99,9 @@ async function bootstrap() {
   // Swagger API Documentation
   const swaggerConfig = new DocumentBuilder()
     .setTitle('NestJS Production Boilerplate API')
-    .setDescription('Production-ready NestJS API with authentication, authorization, and monitoring')
+    .setDescription(
+      'Production-ready NestJS API with authentication, authorization, and monitoring',
+    )
     .setVersion('1.0')
     .addBearerAuth(
       {

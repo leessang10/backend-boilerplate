@@ -6,7 +6,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { AuditService } from '../application/audit.service';
-import { Roles } from '../../../common/decorators/roles.decorator';
+import { Roles } from '../../../shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('Audit')

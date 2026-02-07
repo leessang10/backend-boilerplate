@@ -10,7 +10,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { Public } from '../../../common/decorators/public.decorator';
+import { Public } from '../../../shared/decorators/public.decorator';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, interval, map } from 'rxjs';

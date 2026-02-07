@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { UploadService } from '../application/upload.service';
-import { Roles } from '../../../common/decorators/roles.decorator';
+import { Roles } from '../../../shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { FeatureFlagService } from '../application/feature-flag.service';
-import { Roles } from '../../../common/decorators/roles.decorator';
+import { Roles } from '../../../shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 

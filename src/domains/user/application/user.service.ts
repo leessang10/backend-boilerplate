@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CryptoService } from '../../../common/crypto/crypto.service';
+import { CryptoService } from '../../../shared/crypto/crypto.service';
 import { CreateUserDto } from '../presentation/dto/create-user.dto';
 import { UpdateUserDto } from '../presentation/dto/update-user.dto';
 import { QueryUserDto } from '../presentation/dto/query-user.dto';

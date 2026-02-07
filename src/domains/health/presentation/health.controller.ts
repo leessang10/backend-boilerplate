@@ -6,7 +6,7 @@ import {
   DiskHealthIndicator,
 } from '@nestjs/terminus';
 import { parse } from 'node:path';
-import { Public } from '../../../common/decorators/public.decorator';
+import { Public } from '../../../shared/decorators/public.decorator';
 import { DATABASE_HEALTH_PORT } from '../domain/ports/database-health.port';
 import type { DatabaseHealthPort } from '../domain/ports/database-health.port';
 

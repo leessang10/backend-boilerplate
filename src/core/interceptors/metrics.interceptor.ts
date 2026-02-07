@@ -1,4 +1,10 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+  Logger,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
@@ -10,7 +16,8 @@ export class MetricsInterceptor implements NestInterceptor {
 
   constructor(
     @InjectMetric('http_requests_total') private httpRequestsCounter: Counter,
-    @InjectMetric('http_request_duration_seconds') private httpDurationHistogram: Histogram,
+    @InjectMetric('http_request_duration_seconds')
+    private httpDurationHistogram: Histogram,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {

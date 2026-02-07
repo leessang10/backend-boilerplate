@@ -8,7 +8,8 @@ export const CACHE_TTL_METADATA = 'cache:ttl';
  * @param keyPattern - Pattern for cache key, use {param} for dynamic values
  * @example @CacheKey('user:{id}')
  */
-export const CacheKey = (keyPattern: string) => SetMetadata(CACHE_KEY_METADATA, keyPattern);
+export const CacheKey = (keyPattern: string) =>
+  SetMetadata(CACHE_KEY_METADATA, keyPattern);
 
 /**
  * Decorator to set cache TTL (in seconds)

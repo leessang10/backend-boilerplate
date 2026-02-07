@@ -1,10 +1,18 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(PrismaService.name);
   private readonly pool: Pool;
 
@@ -58,7 +66,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   /**
    * Helper method for transactions
    */
-  async runTransaction<T>(fn: (prisma: PrismaClient) => Promise<T>): Promise<T> {
+  async runTransaction<T>(
+    fn: (prisma: PrismaClient) => Promise<T>,
+  ): Promise<T> {
     return this.$transaction(fn);
   }
 

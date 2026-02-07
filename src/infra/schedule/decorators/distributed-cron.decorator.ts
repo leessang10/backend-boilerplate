@@ -18,7 +18,9 @@ export function withDistributedLock(lockKey: string, ttl: number = 60000) {
       const cache: Cache = this.cacheManager;
 
       if (!cache) {
-        throw new Error('Cache manager not injected. Make sure CacheModule is imported.');
+        throw new Error(
+          'Cache manager not injected. Make sure CacheModule is imported.',
+        );
       }
 
       const lockValue = `lock:${lockKey}`;
@@ -28,7 +30,9 @@ export function withDistributedLock(lockKey: string, ttl: number = 60000) {
         const existingLock = await cache.get(lockValue);
 
         if (existingLock) {
-          this.logger?.debug(`Skipping ${propertyKey}: lock already held by another instance`);
+          this.logger?.debug(
+            `Skipping ${propertyKey}: lock already held by another instance`,
+          );
           return;
         }
 

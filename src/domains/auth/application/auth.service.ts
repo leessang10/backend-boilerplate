@@ -15,7 +15,7 @@ import { AuthResponseDto } from '../presentation/dto/auth-response.dto';
 import { UserLoginEvent, UserLogoutEvent } from '../domain/events/auth.events';
 import type { AuthJwtConfig } from '../domain/types/jwt-config.type';
 import * as argon2 from 'argon2';
-import { CryptoService } from '../../../common/crypto/crypto.service';
+import { CryptoService } from '../../../shared/crypto/crypto.service';
 import { AuthRepository } from '../infrastructure/auth.repository';
 
 export interface JwtPayload {

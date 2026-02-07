@@ -23,13 +23,17 @@ export class QueueService {
 
   constructor(
     @InjectQueue(QUEUE_NAMES.EMAIL) private emailQueue: Queue<EmailJobData>,
-    @InjectQueue(QUEUE_NAMES.NOTIFICATION) private notificationQueue: Queue<NotificationJobData>,
+    @InjectQueue(QUEUE_NAMES.NOTIFICATION)
+    private notificationQueue: Queue<NotificationJobData>,
   ) {}
 
   /**
    * Add email to queue
    */
-  async sendEmail(data: EmailJobData, options?: { delay?: number; priority?: number }) {
+  async sendEmail(
+    data: EmailJobData,
+    options?: { delay?: number; priority?: number },
+  ) {
     try {
       const job = await this.emailQueue.add('send-email', data, {
         delay: options?.delay,
@@ -46,12 +50,17 @@ export class QueueService {
   /**
    * Add notification to queue
    */
-  async sendNotification(data: NotificationJobData, options?: { delay?: number }) {
+  async sendNotification(
+    data: NotificationJobData,
+    options?: { delay?: number },
+  ) {
     try {
       const job = await this.notificationQueue.add('send-notification', data, {
         delay: options?.delay,
       });
-      this.logger.log(`Notification job ${job.id} added for user ${data.userId}`);
+      this.logger.log(
+        `Notification job ${job.id} added for user ${data.userId}`,
+      );
       return job;
     } catch (error) {
       this.logger.error(`Failed to add notification job: ${error.message}`);
@@ -63,7 +72,10 @@ export class QueueService {
    * Get queue statistics
    */
   async getQueueStats(queueName: string) {
-    const queue = queueName === QUEUE_NAMES.EMAIL ? this.emailQueue : this.notificationQueue;
+    const queue =
+      queueName === QUEUE_NAMES.EMAIL
+        ? this.emailQueue
+        : this.notificationQueue;
 
     const [waiting, active, completed, failed, delayed] = await Promise.all([
       queue.getWaitingCount(),

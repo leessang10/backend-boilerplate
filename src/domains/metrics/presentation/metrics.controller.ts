@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { Public } from '../../../common/decorators/public.decorator';
+import { Public } from '../../../shared/decorators/public.decorator';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import { Counter } from 'prom-client';
 

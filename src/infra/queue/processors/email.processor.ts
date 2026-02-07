@@ -30,7 +30,9 @@ export class EmailProcessor {
       this.completedCounter.inc({ queue: QUEUE_NAMES.EMAIL });
       return { success: true, sentAt: new Date() };
     } catch (error) {
-      this.logger.error(`Failed to send email to ${job.data.to}: ${error.message}`);
+      this.logger.error(
+        `Failed to send email to ${job.data.to}: ${error.message}`,
+      );
       this.failedCounter.inc({ queue: QUEUE_NAMES.EMAIL });
       throw error; // Will trigger retry based on job options
     }

@@ -87,7 +87,9 @@ export class AuditInterceptor implements NestInterceptor {
               status: 'failure',
             });
           } catch (auditError) {
-            this.logger.error(`Failed to create audit log: ${auditError.message}`);
+            this.logger.error(
+              `Failed to create audit log: ${auditError.message}`,
+            );
           }
         },
       }),
@@ -148,7 +150,14 @@ export class AuditInterceptor implements NestInterceptor {
 
     // Remove sensitive fields
     const sanitized = { ...body };
-    const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'accessToken', 'refreshToken'];
+    const sensitiveFields = [
+      'password',
+      'token',
+      'secret',
+      'apiKey',
+      'accessToken',
+      'refreshToken',
+    ];
 
     for (const field of sensitiveFields) {
       if (sanitized[field]) {

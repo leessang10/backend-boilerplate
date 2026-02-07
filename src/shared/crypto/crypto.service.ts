@@ -34,7 +34,11 @@ export class CryptoService {
       const iv = crypto.randomBytes(this.ivLength);
 
       // Create cipher
-      const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv);
+      const cipher = crypto.createCipheriv(
+        this.algorithm,
+        this.encryptionKey,
+        iv,
+      );
 
       // Encrypt
       let encrypted = cipher.update(plaintext, 'utf8', 'hex');
@@ -73,7 +77,11 @@ export class CryptoService {
       const encrypted = parts[2];
 
       // Create decipher
-      const decipher = crypto.createDecipheriv(this.algorithm, this.encryptionKey, iv);
+      const decipher = crypto.createDecipheriv(
+        this.algorithm,
+        this.encryptionKey,
+        iv,
+      );
       decipher.setAuthTag(authTag);
 
       // Decrypt

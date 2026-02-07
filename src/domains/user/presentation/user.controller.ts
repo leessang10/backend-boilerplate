@@ -15,9 +15,9 @@ import { UserService } from '../application/user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
-import { Public } from '../../../common/decorators/public.decorator';
-import { Roles } from '../../../common/decorators/roles.decorator';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { Public } from '../../../shared/decorators/public.decorator';
+import { Roles } from '../../../shared/decorators/roles.decorator';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 
 @Controller({ path: 'users', version: '1' })
 export class UserController {

@@ -1,7 +1,7 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
+import { IS_PUBLIC_KEY } from '../../shared/decorators/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -10,7 +10,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest<{ method: string; path?: string; url?: string }>();
+    const request = context
+      .switchToHttp()
+      .getRequest<{ method: string; path?: string; url?: string }>();
     const requestPath = request.path ?? request.url ?? '';
 
     // Prometheus scrape endpoint should be publicly accessible.

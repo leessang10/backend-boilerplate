@@ -75,7 +75,7 @@ export default tseslint.config(
   },
   {
     files: [
-      'src/common/**/*.ts',
+      'src/shared/**/*.ts',
       'src/core/**/*.ts',
       'src/config/**/*.ts',
       'src/infra/**/*.ts',
@@ -105,7 +105,7 @@ export default tseslint.config(
   {
     files: [
       'src/*.ts',
-      'src/{common,core,config,infra,shared}/**/*.ts',
+      'src/{core,config,infra,shared}/**/*.ts',
       'test/**/*.ts',
     ],
     rules: {

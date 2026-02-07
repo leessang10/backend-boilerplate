@@ -12,7 +12,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger, UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from '../infrastructure/guards/ws-jwt.guard';
-import { CurrentUser } from '../../../common/decorators/current-user.decorator';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import type { Gauge } from 'prom-client';
 import type { WsUser } from '../domain/types/ws-user.type';

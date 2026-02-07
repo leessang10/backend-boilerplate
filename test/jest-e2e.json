@@ -11,7 +11,6 @@
     "^@shared/(.*)$": "<rootDir>/src/shared/$1",
     "^@infra/(.*)$": "<rootDir>/src/infra/$1",
     "^@domains/(.*)$": "<rootDir>/src/domains/$1",
-    "^@common/(.*)$": "<rootDir>/src/common/$1",
     "^@config/(.*)$": "<rootDir>/src/config/$1"
   },
   "transform": {
