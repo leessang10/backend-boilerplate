@@ -1,15 +1,24 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PrismaService } from '../../infra/prisma/prisma.service';
-import { UserService } from '../user/user.service';
-import { LoginDto } from './dto/login.dto';
-import { AuthResponseDto } from './dto/auth-response.dto';
-import { UserResponseDto } from '../user/dto/user-response.dto';
-import { UserLoginEvent, UserLogoutEvent } from '../../infra/events/auth.events';
+import { PrismaService } from '../../../infra/prisma/prisma.service';
+import { LoginDto } from '../presentation/dto/login.dto';
+import { AuthResponseDto } from '../presentation/dto/auth-response.dto';
+import { UserResponseDto } from '../../user/presentation/dto/user-response.dto';
+import {
+  UserLoginEvent,
+  UserLogoutEvent,
+} from '../../../infra/events/auth.events';
 import * as argon2 from 'argon2';
-import { CryptoService } from '../../common/crypto/crypto.service';
+import { CryptoService } from '../../../common/crypto/crypto.service';
+import { USER_READER_PORT } from '../../user/domain/ports/user-reader.port';
+import type { UserReaderPort } from '../../user/domain/ports/user-reader.port';
 
 export interface JwtPayload {
   sub: string;
@@ -23,7 +32,7 @@ export class AuthService {
 
   constructor(
     private prisma: PrismaService,
-    private userService: UserService,
+    @Inject(USER_READER_PORT) private readonly userReader: UserReaderPort,
     private jwtService: JwtService,
     private configService: ConfigService,
     private crypto: CryptoService,
@@ -32,7 +41,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     // Find user
-    const user = await this.userService.findByEmail(loginDto.email);
+    const user = await this.userReader.findByEmail(loginDto.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -44,7 +53,10 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await argon2.verify(user.password, loginDto.password);
+    const isPasswordValid = await argon2.verify(
+      user.password,
+      loginDto.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
@@ -116,7 +128,9 @@ export class AuthService {
       // Prepare user response
       const userResponse = new UserResponseDto({
         ...storedToken.user,
-        phone: storedToken.user.phone ? this.crypto.decrypt(storedToken.user.phone) : undefined,
+        phone: storedToken.user.phone
+          ? this.crypto.decrypt(storedToken.user.phone)
+          : undefined,
       });
 
       return {
@@ -157,7 +171,9 @@ export class AuthService {
     }
   }
 
-  private async generateTokens(user: any): Promise<{ accessToken: string; refreshToken: string }> {
+  private async generateTokens(
+    user: any,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const jwtConfig = this.configService.get('jwt');
 
     const payload: JwtPayload = {

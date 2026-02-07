@@ -1,30 +1,41 @@
-import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
+import { User } from '@prisma/client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PrismaService } from '../../infra/prisma/prisma.service';
-import { CryptoService } from '../../common/crypto/crypto.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { QueryUserDto } from './dto/query-user.dto';
-import { UserResponseDto } from './dto/user-response.dto';
-import { PaginationMeta } from '../../shared/interfaces/response.interface';
-import { UserCreatedEvent, UserUpdatedEvent, UserDeletedEvent } from '../../infra/events/user.events';
+import { CryptoService } from '../../../common/crypto/crypto.service';
+import { CreateUserDto } from '../presentation/dto/create-user.dto';
+import { UpdateUserDto } from '../presentation/dto/update-user.dto';
+import { QueryUserDto } from '../presentation/dto/query-user.dto';
+import { UserResponseDto } from '../presentation/dto/user-response.dto';
+import { PaginationMeta } from '../../../shared/interfaces/response.interface';
+import {
+  UserCreatedEvent,
+  UserUpdatedEvent,
+  UserDeletedEvent,
+} from '../../../infra/events/user.events';
+import { UserRepository } from '../infrastructure/user.repository';
+import { UserReaderPort } from '../domain/ports/user-reader.port';
 import * as argon2 from 'argon2';
 
 @Injectable()
-export class UserService {
+export class UserService implements UserReaderPort {
   private readonly logger = new Logger(UserService.name);
 
   constructor(
-    private prisma: PrismaService,
-    private crypto: CryptoService,
-    private eventEmitter: EventEmitter2,
+    private readonly userRepository: UserRepository,
+    private readonly crypto: CryptoService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     // Check if user already exists
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: createUserDto.email },
-    });
+    const existingUser = await this.userRepository.findByEmail(
+      createUserDto.email,
+    );
 
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
@@ -39,15 +50,13 @@ export class UserService {
       : undefined;
 
     // Create user
-    const user = await this.prisma.user.create({
-      data: {
-        email: createUserDto.email,
-        password: hashedPassword,
-        firstName: createUserDto.firstName,
-        lastName: createUserDto.lastName,
-        phone: encryptedPhone,
-        role: createUserDto.role,
-      },
+    const user = await this.userRepository.create({
+      email: createUserDto.email,
+      password: hashedPassword,
+      firstName: createUserDto.firstName,
+      lastName: createUserDto.lastName,
+      phone: encryptedPhone,
+      role: createUserDto.role,
     });
 
     this.logger.log(`User created: ${user.id}`);
@@ -61,8 +70,17 @@ export class UserService {
     return this.toResponseDto(user);
   }
 
-  async findAll(query: QueryUserDto): Promise<{ data: UserResponseDto[]; meta: PaginationMeta }> {
-    const { page = 1, limit = 10, search, role, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+  async findAll(
+    query: QueryUserDto,
+  ): Promise<{ data: UserResponseDto[]; meta: PaginationMeta }> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      role,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
 
     const skip = (page - 1) * limit;
 
@@ -82,14 +100,11 @@ export class UserService {
     }
 
     // Get total count
-    const total = await this.prisma.user.count({ where });
+    const total = await this.userRepository.count(where);
 
     // Get users
-    const users = await this.prisma.user.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { [sortBy]: sortOrder },
+    const users = await this.userRepository.findMany(where, skip, limit, {
+      [sortBy]: sortOrder,
     });
 
     // Build pagination meta
@@ -110,9 +125,7 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -121,17 +134,16 @@ export class UserService {
     return this.toResponseDto(user);
   }
 
-  async findByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email },
-    });
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findByEmail(email);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
     // Check if user exists
-    const existingUser = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    const existingUser = await this.userRepository.findById(id);
 
     if (!existingUser) {
       throw new NotFoundException('User not found');
@@ -143,26 +155,26 @@ export class UserService {
       : undefined;
 
     // Update user
-    const user = await this.prisma.user.update({
-      where: { id },
-      data: {
-        firstName: updateUserDto.firstName,
-        lastName: updateUserDto.lastName,
-        phone: encryptedPhone,
-        role: updateUserDto.role,
-        isActive: updateUserDto.isActive,
-      },
+    const user = await this.userRepository.update(id, {
+      firstName: updateUserDto.firstName,
+      lastName: updateUserDto.lastName,
+      phone: encryptedPhone,
+      role: updateUserDto.role,
+      isActive: updateUserDto.isActive,
     });
 
     this.logger.log(`User updated: ${user.id}`);
 
     // Emit user updated event
-    const changes = Object.keys(updateUserDto).reduce((acc, key) => {
-      if (updateUserDto[key] !== undefined) {
-        acc[key] = updateUserDto[key];
-      }
-      return acc;
-    }, {} as Record<string, any>);
+    const changes = Object.keys(updateUserDto).reduce(
+      (acc, key) => {
+        if (updateUserDto[key] !== undefined) {
+          acc[key] = updateUserDto[key];
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     this.eventEmitter.emit(
       'user.updated',
@@ -174,18 +186,14 @@ export class UserService {
 
   async remove(id: string): Promise<void> {
     // Check if user exists
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
+    const user = await this.userRepository.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     // Delete user
-    await this.prisma.user.delete({
-      where: { id },
-    });
+    await this.userRepository.delete(id);
 
     this.logger.log(`User deleted: ${id}`);
 
@@ -199,7 +207,7 @@ export class UserService {
   /**
    * Convert user to response DTO (decrypt sensitive fields)
    */
-  private toResponseDto(user: any): UserResponseDto {
+  private toResponseDto(user: User): UserResponseDto {
     const dto = new UserResponseDto({
       ...user,
       phone: user.phone ? this.crypto.decrypt(user.phone) : undefined,
