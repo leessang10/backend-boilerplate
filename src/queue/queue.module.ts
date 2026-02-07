@@ -5,6 +5,7 @@ import { getBullConfig } from '../config/bull.config';
 import { EmailProcessor } from './processors/email.processor';
 import { QueueService } from './queue.service';
 import { QUEUE_NAMES } from './queue.constants';
+import { MetricsModule } from '../modules/metrics/metrics.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { QUEUE_NAMES } from './queue.constants';
       { name: QUEUE_NAMES.EMAIL },
       { name: QUEUE_NAMES.NOTIFICATION },
     ),
+    MetricsModule,
   ],
   providers: [EmailProcessor, QueueService],
   exports: [QueueService, BullModule],

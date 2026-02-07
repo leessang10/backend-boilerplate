@@ -9,9 +9,11 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, UseGuards } from '@nestjs/common';
+import { Logger, UseGuards, Inject } from '@nestjs/common';
 import { WsJwtGuard } from './guards/ws-jwt.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import type { Gauge } from 'prom-client';
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -37,17 +39,24 @@ export class WebsocketGateway
   private readonly logger = new Logger(WebsocketGateway.name);
   private readonly connectedClients = new Map<string, AuthenticatedSocket>();
 
+  constructor(
+    @InjectMetric('websocket_connections_total')
+    private readonly connectionsGauge: Gauge<string>,
+  ) {}
+
   afterInit(server: Server) {
     this.logger.log('WebSocket Gateway initialized');
   }
 
   handleConnection(client: AuthenticatedSocket) {
     this.logger.log(`Client connecting: ${client.id}`);
+    this.connectionsGauge.inc({ gateway: 'main' });
   }
 
   handleDisconnect(client: AuthenticatedSocket) {
     this.logger.log(`Client disconnected: ${client.id}`);
     this.connectedClients.delete(client.id);
+    this.connectionsGauge.dec({ gateway: 'main' });
 
     if (client.user) {
       // Notify others in the same room

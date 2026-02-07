@@ -6,7 +6,6 @@ const envSchema = z.object({
     .enum(['development', 'production', 'test', 'staging'])
     .default('development'),
   PORT: z.string().default('3000').transform(Number).pipe(z.number().positive()),
-  API_PREFIX: z.string().default('v1'),
 
   // Database
   DATABASE_URL: z.string().url(),

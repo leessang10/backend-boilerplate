@@ -28,7 +28,6 @@ async function bootstrap() {
   // Get ConfigService
   const configService = app.get(ConfigService);
   const port = configService.get('PORT', 3000);
-  const apiPrefix = configService.get('API_PREFIX', 'api').replace(/^\/+|\/+$/g, '');
   const corsOrigin = configService.get('CORS_ORIGIN', 'http://localhost:3000').split(',');
 
   // Use Pino logger
@@ -53,20 +52,19 @@ async function bootstrap() {
   });
 
   // Global prefix (exclude infra endpoints that should stay at root)
-  if (apiPrefix) {
-    app.setGlobalPrefix(apiPrefix, {
-      exclude: [
-        { path: 'metrics', method: RequestMethod.ALL },
-        { path: 'metrics/(.*)', method: RequestMethod.ALL },
-        { path: 'admin/queues', method: RequestMethod.ALL },
-        { path: 'admin/queues/(.*)', method: RequestMethod.ALL },
-        { path: 'health', method: RequestMethod.ALL },
-        { path: 'health/(.*)', method: RequestMethod.ALL },
-        { path: 'v1/health', method: RequestMethod.ALL },
-        { path: 'v1/health/(.*)', method: RequestMethod.ALL },
-      ],
-    });
-  }
+
+  app.setGlobalPrefix('api', {
+    exclude: [
+      { path: 'metrics', method: RequestMethod.ALL },
+      { path: 'metrics/(.*)', method: RequestMethod.ALL },
+      { path: 'admin/queues', method: RequestMethod.ALL },
+      { path: 'admin/queues/(.*)', method: RequestMethod.ALL },
+      { path: 'health', method: RequestMethod.ALL },
+      { path: 'health/(.*)', method: RequestMethod.ALL },
+      { path: 'v1/health', method: RequestMethod.ALL },
+      { path: 'v1/health/(.*)', method: RequestMethod.ALL },
+    ],
+  });
 
   // Global pipes
   app.useGlobalPipes(
@@ -115,7 +113,7 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  const apiBaseUrl = apiPrefix ? `http://localhost:${port}/${apiPrefix}` : `http://localhost:${port}`;
+  const apiBaseUrl = `http://localhost:${port}/api`;
   console.log(`🚀 Application is running on: ${apiBaseUrl}`);
   console.log(`📚 API Documentation: http://localhost:${port}/api-docs`);
   console.log(`💚 Health Check: http://localhost:${port}/v1/health`);

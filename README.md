@@ -18,6 +18,7 @@ A production-ready NestJS boilerplate with authentication, authorization, monito
 - ✅ **Validation** - Class-validator with auto-transformation
 
 ### Production Features
+- ✅ **Monitoring** - Prometheus metrics & Grafana dashboards
 - ✅ **Docker** - Multi-stage Dockerfile & docker-compose
 - ✅ **Kubernetes** - Deployment manifests with rolling updates
 - ✅ **CI/CD** - GitHub Actions workflows
@@ -36,6 +37,7 @@ A production-ready NestJS boilerplate with authentication, authorization, monito
 - **Logger**: Pino
 - **Validation**: class-validator & class-transformer
 - **Documentation**: Swagger/OpenAPI
+- **Monitoring**: Prometheus & Grafana
 - **Testing**: Jest
 - **Containerization**: Docker
 - **Orchestration**: Kubernetes
@@ -97,6 +99,10 @@ The API will be available at:
 - **API**: http://localhost:3000/v1
 - **Documentation**: http://localhost:3000/api-docs
 - **Health Check**: http://localhost:3000/v1/health
+- **Metrics**: http://localhost:3000/metrics
+- **Bull Board**: http://localhost:3000/admin/queues
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3001 (admin/admin)
 
 ### Default Credentials
 
@@ -361,6 +367,43 @@ rm -rf node_modules dist
 pnpm install
 pnpm build
 ```
+
+## Monitoring & Observability
+
+This project includes a complete monitoring stack with Prometheus and Grafana.
+
+### Quick Start
+
+1. **Start monitoring services**:
+```bash
+docker-compose up -d prometheus grafana
+```
+
+2. **Access dashboards**:
+- **Prometheus UI**: http://localhost:9090
+- **Grafana Dashboard**: http://localhost:3001 (admin/admin)
+- **Application Metrics**: http://localhost:3000/metrics
+
+### Available Metrics
+
+- **HTTP Metrics**: Request rate, duration, status codes
+- **Authentication**: Login attempts, user registrations
+- **Queue Jobs**: Completed/failed job counts
+- **WebSocket**: Active connections
+- **System**: CPU, memory, event loop lag
+
+### Pre-configured Dashboard
+
+A production-ready Grafana dashboard is automatically provisioned with:
+- HTTP Request Rate & Duration
+- Error Rate Monitoring
+- Queue Job Processing
+- WebSocket Connections
+- System Health Metrics
+
+### Documentation
+
+For detailed monitoring setup and usage, see [MONITORING.md](./MONITORING.md).
 
 ## License
 
