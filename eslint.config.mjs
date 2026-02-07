@@ -25,11 +25,60 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/domains/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'warn',
+        {
+          patterns: [
+            {
+              group: [
+                '@infra/*',
+                '../../infra/*',
+                '../../../infra/*',
+                '../../../../infra/*',
+              ],
+              message:
+                'Do not import infra directly from domains. Depend on domain ports/interfaces.',
+            },
+            {
+              group: ['@domains/*/*'],
+              message:
+                'Use the domain public API (e.g. @domains/<name>) instead of deep domain imports.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/modules/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'warn',
+        {
+          patterns: [
+            {
+              group: [
+                '../../prisma/*',
+                '../../cache/*',
+                '../../queue/*',
+                '../../schedule/*',
+              ],
+              message:
+                'Avoid direct infra dependency from feature modules. Route through infra modules/adapters.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },
 );
