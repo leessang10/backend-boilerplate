@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CryptoService } from '../../common/crypto/crypto.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -6,6 +7,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryUserDto } from './dto/query-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { PaginationMeta } from '../../common/interfaces/response.interface';
+import { UserCreatedEvent, UserUpdatedEvent, UserDeletedEvent } from '../../common/events/user.events';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -15,6 +17,7 @@ export class UserService {
   constructor(
     private prisma: PrismaService,
     private crypto: CryptoService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
@@ -48,6 +51,12 @@ export class UserService {
     });
 
     this.logger.log(`User created: ${user.id}`);
+
+    // Emit user created event
+    this.eventEmitter.emit(
+      'user.created',
+      new UserCreatedEvent(user.id, user.email, user.role),
+    );
 
     return this.toResponseDto(user);
   }
@@ -147,6 +156,19 @@ export class UserService {
 
     this.logger.log(`User updated: ${user.id}`);
 
+    // Emit user updated event
+    const changes = Object.keys(updateUserDto).reduce((acc, key) => {
+      if (updateUserDto[key] !== undefined) {
+        acc[key] = updateUserDto[key];
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    this.eventEmitter.emit(
+      'user.updated',
+      new UserUpdatedEvent(user.id, user.email, changes),
+    );
+
     return this.toResponseDto(user);
   }
 
@@ -166,6 +188,12 @@ export class UserService {
     });
 
     this.logger.log(`User deleted: ${id}`);
+
+    // Emit user deleted event
+    this.eventEmitter.emit(
+      'user.deleted',
+      new UserDeletedEvent(user.id, user.email),
+    );
   }
 
   /**

@@ -1,11 +1,13 @@
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { UserResponseDto } from '../user/dto/user-response.dto';
+import { UserLoginEvent, UserLogoutEvent } from '../../common/events/auth.events';
 import * as argon2 from 'argon2';
 import { CryptoService } from '../../common/crypto/crypto.service';
 
@@ -25,6 +27,7 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private crypto: CryptoService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
@@ -54,6 +57,12 @@ export class AuthService {
     await this.saveRefreshToken(user.id, refreshToken);
 
     this.logger.log(`User logged in: ${user.id}`);
+
+    // Emit login event
+    this.eventEmitter.emit(
+      'user.login',
+      new UserLoginEvent(user.id, user.email),
+    );
 
     // Prepare user response
     const userResponse = new UserResponseDto({
@@ -137,6 +146,15 @@ export class AuthService {
     }
 
     this.logger.log(`User logged out: ${userId}`);
+
+    // Get user email for event
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (user) {
+      this.eventEmitter.emit(
+        'user.logout',
+        new UserLogoutEvent(user.id, user.email),
+      );
+    }
   }
 
   private async generateTokens(user: any): Promise<{ accessToken: string; refreshToken: string }> {

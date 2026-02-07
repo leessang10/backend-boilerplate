@@ -54,9 +54,9 @@ model AuditLog {
   userId    String?
   action    String   // CREATE, UPDATE, DELETE
   entity    String   // User, FeatureFlag, etc.
-  entityId  String
-  changes   Json?    // Stored as JSONB
+  entityId  String?
   metadata  Json?    // Request metadata
+  status    String   @default("success") // success, failure
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -70,6 +70,7 @@ model AuditLog {
 model FeatureFlag {
   id          String   @id @default(cuid())
   key         String   @unique
+  name        String
   enabled     Boolean  @default(false)
   description String?
   metadata    Json?
@@ -81,11 +82,14 @@ model FeatureFlag {
 }
 
 model IdempotencyKey {
-  id        String   @id
-  response  Json
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  id         String   @id @default(cuid())
+  key        String   @unique
+  statusCode Int      @default(200)
+  response   Json
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
 
+  @@index([key])
   @@index([expiresAt])
   @@map("idempotency_keys")
 }

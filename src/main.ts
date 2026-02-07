@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { RequestMethod, VERSION_NEUTRAL, ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -8,18 +8,27 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { RequestIdMiddleware } from './common/middlewares/request-id.middleware';
+import { IdempotencyMiddleware } from './common/middlewares/idempotency.middleware';
+import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  // Apply request ID middleware
   const requestIdMiddleware = new RequestIdMiddleware();
   app.use((req, res, next) => requestIdMiddleware.use(req, res, next));
+
+  // Apply idempotency middleware
+  const prismaService = app.get(PrismaService);
+  const idempotencyMiddleware = new IdempotencyMiddleware(prismaService);
+  app.use((req, res, next) => idempotencyMiddleware.use(req, res, next));
 
   // Get ConfigService
   const configService = app.get(ConfigService);
   const port = configService.get('PORT', 3000);
-  const apiPrefix = configService.get('API_PREFIX', 'v1');
+  const apiPrefix = configService.get('API_PREFIX', 'api').replace(/^\/+|\/+$/g, '');
   const corsOrigin = configService.get('CORS_ORIGIN', 'http://localhost:3000').split(',');
 
   // Use Pino logger
@@ -40,11 +49,24 @@ async function bootstrap() {
   // API Versioning (URI-based)
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '1',
+    defaultVersion: VERSION_NEUTRAL,
   });
 
-  // Global prefix
-  app.setGlobalPrefix(apiPrefix);
+  // Global prefix (exclude infra endpoints that should stay at root)
+  if (apiPrefix) {
+    app.setGlobalPrefix(apiPrefix, {
+      exclude: [
+        { path: 'metrics', method: RequestMethod.ALL },
+        { path: 'metrics/(.*)', method: RequestMethod.ALL },
+        { path: 'admin/queues', method: RequestMethod.ALL },
+        { path: 'admin/queues/(.*)', method: RequestMethod.ALL },
+        { path: 'health', method: RequestMethod.ALL },
+        { path: 'health/(.*)', method: RequestMethod.ALL },
+        { path: 'v1/health', method: RequestMethod.ALL },
+        { path: 'v1/health/(.*)', method: RequestMethod.ALL },
+      ],
+    });
+  }
 
   // Global pipes
   app.useGlobalPipes(
@@ -93,9 +115,12 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  console.log(`🚀 Application is running on: http://localhost:${port}/${apiPrefix}`);
+  const apiBaseUrl = apiPrefix ? `http://localhost:${port}/${apiPrefix}` : `http://localhost:${port}`;
+  console.log(`🚀 Application is running on: ${apiBaseUrl}`);
   console.log(`📚 API Documentation: http://localhost:${port}/api-docs`);
-  console.log(`💚 Health Check: http://localhost:${port}/${apiPrefix}/health`);
+  console.log(`💚 Health Check: http://localhost:${port}/v1/health`);
+  console.log(`🧰 Bull Board: http://localhost:${port}/admin/queues`);
+  console.log(`📈 Prometheus: http://localhost:${port}/metrics`);
   console.log(`📚 Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 

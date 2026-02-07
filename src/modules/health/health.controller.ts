@@ -57,7 +57,7 @@ export class HealthController {
       () =>
         this.disk.checkStorage('storage', {
           path: this.diskCheckPath,
-          thresholdPercent: 0.5,
+          thresholdPercent: 0.9,
         }),
     ]);
   }

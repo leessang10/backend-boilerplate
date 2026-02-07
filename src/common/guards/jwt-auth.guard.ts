@@ -10,6 +10,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
+    const request = context.switchToHttp().getRequest<{ method: string; path?: string; url?: string }>();
+    const requestPath = request.path ?? request.url ?? '';
+
+    // Prometheus scrape endpoint should be publicly accessible.
+    if (request.method === 'GET' && requestPath === '/metrics') {
+      return true;
+    }
+
     // Check if route is marked as public
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),

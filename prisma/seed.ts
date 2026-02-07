@@ -80,21 +80,25 @@ async function main() {
   const featureFlags = [
     {
       key: 'enable_email_notifications',
+      name: 'Email Notifications',
       enabled: true,
       description: 'Enable email notifications for users',
     },
     {
       key: 'enable_websocket',
+      name: 'WebSocket Features',
       enabled: true,
       description: 'Enable WebSocket real-time features',
     },
     {
       key: 'enable_file_upload',
+      name: 'File Upload',
       enabled: true,
       description: 'Enable file upload functionality',
     },
     {
       key: 'maintenance_mode',
+      name: 'Maintenance Mode',
       enabled: false,
       description: 'Put application in maintenance mode',
     },
