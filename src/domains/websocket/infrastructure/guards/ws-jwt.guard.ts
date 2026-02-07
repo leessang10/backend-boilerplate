@@ -1,11 +1,18 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
+import type { AuthJwtConfig } from '@domains/auth';
+import type { WsJwtPayload, WsUser } from '../../domain/types/ws-user.type';
 
 interface AuthenticatedSocket extends Socket {
-  user?: any;
+  user?: WsUser;
 }
 
 @Injectable()
@@ -26,8 +33,12 @@ export class WsJwtGuard implements CanActivate {
     }
 
     try {
-      const jwtConfig = this.configService.get('jwt');
-      const payload = await this.jwtService.verifyAsync(token, {
+      const jwtConfig = this.configService.get<AuthJwtConfig>('jwt');
+      if (!jwtConfig) {
+        throw new WsException('Unauthorized: Missing JWT configuration');
+      }
+
+      const payload = await this.jwtService.verifyAsync<WsJwtPayload>(token, {
         secret: jwtConfig.access.secret,
       });
 
@@ -40,21 +51,25 @@ export class WsJwtGuard implements CanActivate {
 
       return true;
     } catch (error) {
-      this.logger.error(`WebSocket authentication failed: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`WebSocket authentication failed: ${message}`);
       throw new WsException('Unauthorized: Invalid token');
     }
   }
 
   private extractToken(client: AuthenticatedSocket): string | null {
     // Extract from handshake auth
-    const authHeader = client.handshake?.auth?.token;
-    if (authHeader) {
-      return authHeader.replace('Bearer ', '');
+    const auth = client.handshake?.auth as unknown;
+    if (typeof auth === 'object' && auth !== null && 'token' in auth) {
+      const authHeader = (auth as { token?: unknown }).token;
+      if (typeof authHeader === 'string') {
+        return authHeader.replace('Bearer ', '');
+      }
     }
 
     // Extract from handshake headers
     const headerToken = client.handshake?.headers?.authorization;
-    if (headerToken) {
+    if (typeof headerToken === 'string') {
       return headerToken.replace('Bearer ', '');
     }
 

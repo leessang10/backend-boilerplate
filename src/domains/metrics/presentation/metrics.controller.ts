@@ -9,7 +9,8 @@ import { Counter } from 'prom-client';
 export class MetricsController {
   constructor(
     @InjectMetric('http_requests_total') private httpRequestsCounter: Counter,
-    @InjectMetric('users_registered_total') private usersRegisteredCounter: Counter,
+    @InjectMetric('users_registered_total')
+    private usersRegisteredCounter: Counter,
     @InjectMetric('login_attempts_total') private loginAttemptsCounter: Counter,
   ) {}
 
@@ -25,7 +26,8 @@ export class MetricsController {
         usersRegistered: 'users_registered_total - Total users registered',
         loginAttempts: 'login_attempts_total - Total login attempts',
         queueJobs: 'queue_jobs_total - Total queue jobs',
-        websocketConnections: 'websocket_connections_total - Total WebSocket connections',
+        websocketConnections:
+          'websocket_connections_total - Total WebSocket connections',
       },
       defaultMetrics: [
         'nodejs_version_info',

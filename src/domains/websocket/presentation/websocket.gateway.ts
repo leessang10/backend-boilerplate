@@ -7,6 +7,7 @@ import {
   OnGatewayInit,
   MessageBody,
   ConnectedSocket,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger, UseGuards } from '@nestjs/common';
@@ -14,13 +15,10 @@ import { WsJwtGuard } from '../infrastructure/guards/ws-jwt.guard';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import type { Gauge } from 'prom-client';
+import type { WsUser } from '../domain/types/ws-user.type';
 
 interface AuthenticatedSocket extends Socket {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
+  user?: WsUser;
 }
 
 @WebSocketGateway({
@@ -44,7 +42,7 @@ export class WebsocketGateway
     private readonly connectionsGauge: Gauge<string>,
   ) {}
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.log('WebSocket Gateway initialized');
   }
 
@@ -71,8 +69,12 @@ export class WebsocketGateway
   @SubscribeMessage('authenticate')
   handleAuthenticate(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @CurrentUser() user: any,
+    @CurrentUser() user: WsUser | undefined,
   ) {
+    if (!user) {
+      throw new WsException('Unauthorized: Missing user context');
+    }
+
     this.logger.log(`Client authenticated: ${client.id} - User: ${user.email}`);
 
     // Store authenticated client
@@ -217,14 +219,14 @@ export class WebsocketGateway
   /**
    * Server-side method to broadcast messages
    */
-  broadcastToRoom(room: string, event: string, data: any) {
+  broadcastToRoom(room: string, event: string, data: unknown) {
     this.server.to(room).emit(event, data);
   }
 
   /**
    * Server-side method to send to specific user
    */
-  sendToUser(userId: string, event: string, data: any) {
+  sendToUser(userId: string, event: string, data: unknown) {
     // Find client by userId
     const client = Array.from(this.connectedClients.values()).find(
       (c) => c.user?.id === userId,

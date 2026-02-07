@@ -11,7 +11,13 @@ import {
   Res,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import { UploadService } from '../application/upload.service';
 import { Roles } from '../../../common/decorators/roles.decorator';
@@ -115,8 +121,11 @@ export class UploadController {
 
   @Get(':fileName')
   @ApiOperation({ summary: 'Download/view a file' })
-  async downloadFile(@Param('fileName') fileName: string, @Res() res: Response) {
-    const uploadDir = this.configService.get<string>('UPLOAD_DEST', './uploads');
+  downloadFile(@Param('fileName') fileName: string, @Res() res: Response) {
+    const uploadDir = this.configService.get<string>(
+      'UPLOAD_DEST',
+      './uploads',
+    );
     const filePath = path.join(uploadDir, fileName);
 
     if (!fs.existsSync(filePath)) {

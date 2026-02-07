@@ -20,7 +20,8 @@ export class LocalStorageService implements IStorageService {
       await fs.mkdir(this.uploadDir, { recursive: true });
       this.logger.log(`Upload directory ensured: ${this.uploadDir}`);
     } catch (error) {
-      this.logger.error(`Failed to create upload directory: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to create upload directory: ${message}`);
     }
   }
 
@@ -50,7 +51,8 @@ export class LocalStorageService implements IStorageService {
       await fs.unlink(filePath);
       this.logger.log(`File deleted: ${fileName}`);
     } catch (error) {
-      this.logger.error(`Failed to delete file ${fileName}: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to delete file ${fileName}: ${message}`);
       throw error;
     }
   }

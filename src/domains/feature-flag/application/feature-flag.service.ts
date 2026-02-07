@@ -1,7 +1,8 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
-import { PrismaService } from '@infra/prisma/prisma.service';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { FEATURE_FLAG_CACHE_PORT } from '../domain/ports/feature-flag-cache.port';
+import type { FeatureFlagCachePort } from '../domain/ports/feature-flag-cache.port';
+import { FEATURE_FLAG_REPOSITORY_PORT } from '../domain/ports/feature-flag-repository.port';
+import type { FeatureFlagRepositoryPort } from '../domain/ports/feature-flag-repository.port';
 
 @Injectable()
 export class FeatureFlagService {
@@ -9,8 +10,10 @@ export class FeatureFlagService {
   private readonly cacheTTL = 300000; // 5 minutes
 
   constructor(
-    private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(FEATURE_FLAG_REPOSITORY_PORT)
+    private readonly featureFlagRepository: FeatureFlagRepositoryPort,
+    @Inject(FEATURE_FLAG_CACHE_PORT)
+    private readonly featureFlagCache: FeatureFlagCachePort,
   ) {}
 
   /**
@@ -18,26 +21,23 @@ export class FeatureFlagService {
    */
   async isEnabled(key: string): Promise<boolean> {
     // Try to get from cache first
-    const cacheKey = `feature:${key}`;
-    const cached = await this.cacheManager.get<boolean>(cacheKey);
+    const cached = await this.featureFlagCache.get(key);
 
     if (cached !== undefined) {
       return cached;
     }
 
     // Get from database
-    const feature = await this.prisma.featureFlag.findUnique({
-      where: { key },
-    });
+    const feature = await this.featureFlagRepository.findByKey(key);
 
     if (!feature) {
       // Feature not found, default to disabled
-      await this.cacheManager.set(cacheKey, false, this.cacheTTL);
+      await this.featureFlagCache.set(key, false, this.cacheTTL);
       return false;
     }
 
     // Cache the result
-    await this.cacheManager.set(cacheKey, feature.enabled, this.cacheTTL);
+    await this.featureFlagCache.set(key, feature.enabled, this.cacheTTL);
 
     return feature.enabled;
   }
@@ -46,19 +46,10 @@ export class FeatureFlagService {
    * Enable a feature
    */
   async enable(key: string): Promise<void> {
-    await this.prisma.featureFlag.upsert({
-      where: { key },
-      update: { enabled: true },
-      create: {
-        key,
-        name: key,
-        description: `Feature flag for ${key}`,
-        enabled: true,
-      },
-    });
+    await this.featureFlagRepository.upsertEnabled(key, true);
 
     // Invalidate cache
-    await this.cacheManager.del(`feature:${key}`);
+    await this.featureFlagCache.del(key);
 
     this.logger.log(`Feature enabled: ${key}`);
   }
@@ -67,13 +58,10 @@ export class FeatureFlagService {
    * Disable a feature
    */
   async disable(key: string): Promise<void> {
-    await this.prisma.featureFlag.update({
-      where: { key },
-      data: { enabled: false },
-    });
+    await this.featureFlagRepository.updateEnabled(key, false);
 
     // Invalidate cache
-    await this.cacheManager.del(`feature:${key}`);
+    await this.featureFlagCache.del(key);
 
     this.logger.log(`Feature disabled: ${key}`);
   }
@@ -82,9 +70,7 @@ export class FeatureFlagService {
    * Toggle a feature
    */
   async toggle(key: string): Promise<boolean> {
-    const feature = await this.prisma.featureFlag.findUnique({
-      where: { key },
-    });
+    const feature = await this.featureFlagRepository.findByKey(key);
 
     if (!feature) {
       throw new Error(`Feature flag not found: ${key}`);
@@ -92,13 +78,10 @@ export class FeatureFlagService {
 
     const newState = !feature.enabled;
 
-    await this.prisma.featureFlag.update({
-      where: { key },
-      data: { enabled: newState },
-    });
+    await this.featureFlagRepository.updateEnabled(key, newState);
 
     // Invalidate cache
-    await this.cacheManager.del(`feature:${key}`);
+    await this.featureFlagCache.del(key);
 
     this.logger.log(`Feature toggled: ${key} -> ${newState}`);
 
@@ -114,13 +97,11 @@ export class FeatureFlagService {
     description?: string,
     enabled = false,
   ) {
-    const feature = await this.prisma.featureFlag.create({
-      data: {
-        key,
-        name,
-        description,
-        enabled,
-      },
+    const feature = await this.featureFlagRepository.create({
+      key,
+      name,
+      description,
+      enabled,
     });
 
     this.logger.log(`Feature flag created: ${key}`);
@@ -132,30 +113,24 @@ export class FeatureFlagService {
    * Get all feature flags
    */
   async findAll() {
-    return this.prisma.featureFlag.findMany({
-      orderBy: { key: 'asc' },
-    });
+    return this.featureFlagRepository.findAll();
   }
 
   /**
    * Get a specific feature flag
    */
   async findOne(key: string) {
-    return this.prisma.featureFlag.findUnique({
-      where: { key },
-    });
+    return this.featureFlagRepository.findByKey(key);
   }
 
   /**
    * Delete a feature flag
    */
   async delete(key: string): Promise<void> {
-    await this.prisma.featureFlag.delete({
-      where: { key },
-    });
+    await this.featureFlagRepository.deleteByKey(key);
 
     // Invalidate cache
-    await this.cacheManager.del(`feature:${key}`);
+    await this.featureFlagCache.del(key);
 
     this.logger.log(`Feature flag deleted: ${key}`);
   }

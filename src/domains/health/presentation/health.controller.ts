@@ -1,34 +1,32 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
-  PrismaHealthIndicator,
   MemoryHealthIndicator,
   DiskHealthIndicator,
 } from '@nestjs/terminus';
 import { parse } from 'node:path';
 import { Public } from '../../../common/decorators/public.decorator';
-import { PrismaService } from '@infra/prisma/prisma.service';
+import { DATABASE_HEALTH_PORT } from '../domain/ports/database-health.port';
+import type { DatabaseHealthPort } from '../domain/ports/database-health.port';
 
 @Controller({ path: 'health', version: '1' })
 export class HealthController {
   private readonly diskCheckPath = parse(process.cwd()).root;
 
   constructor(
-    private health: HealthCheckService,
-    private prismaHealth: PrismaHealthIndicator,
-    private memory: MemoryHealthIndicator,
-    private disk: DiskHealthIndicator,
-    private prisma: PrismaService,
+    private readonly health: HealthCheckService,
+    private readonly memory: MemoryHealthIndicator,
+    private readonly disk: DiskHealthIndicator,
+    @Inject(DATABASE_HEALTH_PORT)
+    private readonly databaseHealth: DatabaseHealthPort,
   ) {}
 
   @Public()
   @Get('ready')
   @HealthCheck()
   ready() {
-    return this.health.check([
-      () => this.prismaHealth.pingCheck('database', this.prisma),
-    ]);
+    return this.health.check([() => this.databaseHealth.check('database')]);
   }
 
   @Public()
@@ -43,7 +41,7 @@ export class HealthController {
   check() {
     return this.health.check([
       // Database health
-      () => this.prismaHealth.pingCheck('database', this.prisma),
+      () => this.databaseHealth.check('database'),
 
       // Memory heap check (should not exceed 150MB)
       () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),

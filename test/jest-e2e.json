@@ -1,8 +1,19 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "..",
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "testMatch": ["<rootDir>/test/e2e/**/*.e2e-spec.ts"],
+  "setupFilesAfterEnv": ["<rootDir>/test/e2e/support/setup-e2e.ts"],
+  "moduleNameMapper": {
+    "^uuid$": "<rootDir>/test/e2e/support/mocks/uuid.ts",
+    "^@app/(.*)$": "<rootDir>/src/app/$1",
+    "^@core/(.*)$": "<rootDir>/src/core/$1",
+    "^@shared/(.*)$": "<rootDir>/src/shared/$1",
+    "^@infra/(.*)$": "<rootDir>/src/infra/$1",
+    "^@domains/(.*)$": "<rootDir>/src/domains/$1",
+    "^@common/(.*)$": "<rootDir>/src/common/$1",
+    "^@config/(.*)$": "<rootDir>/src/config/$1"
+  },
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   }

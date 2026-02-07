@@ -30,8 +30,11 @@ export class StreamingController {
 
   @Get('file/:fileName')
   @ApiOperation({ summary: 'Stream a file download' })
-  async streamFile(@Param('fileName') fileName: string, @Res() res: Response) {
-    const uploadDir = this.configService.get<string>('UPLOAD_DEST', './uploads');
+  streamFile(@Param('fileName') fileName: string, @Res() res: Response) {
+    const uploadDir = this.configService.get<string>(
+      'UPLOAD_DEST',
+      './uploads',
+    );
     const filePath = path.join(uploadDir, fileName);
 
     // Check if file exists
@@ -60,8 +63,11 @@ export class StreamingController {
 
   @Get('video/:fileName')
   @ApiOperation({ summary: 'Stream a video with range support' })
-  async streamVideo(@Param('fileName') fileName: string, @Res() res: Response) {
-    const uploadDir = this.configService.get<string>('UPLOAD_DEST', './uploads');
+  streamVideo(@Param('fileName') fileName: string, @Res() res: Response) {
+    const uploadDir = this.configService.get<string>(
+      'UPLOAD_DEST',
+      './uploads',
+    );
     const filePath = path.join(uploadDir, fileName);
 
     // Check if file exists
@@ -102,7 +108,9 @@ export class StreamingController {
 
   @Sse('events')
   @Public()
-  @ApiOperation({ summary: 'Server-Sent Events endpoint for real-time updates' })
+  @ApiOperation({
+    summary: 'Server-Sent Events endpoint for real-time updates',
+  })
   sendEvents(): Observable<MessageEvent> {
     // Send a message every second with current timestamp
     return interval(1000).pipe(

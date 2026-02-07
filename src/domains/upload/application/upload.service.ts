@@ -19,7 +19,9 @@ export class UploadService {
       throw new BadRequestException('No files provided');
     }
 
-    return Promise.all(files.map((file) => this.localStorageService.upload(file)));
+    return Promise.all(
+      files.map((file) => this.localStorageService.upload(file)),
+    );
   }
 
   async deleteFile(fileName: string): Promise<void> {

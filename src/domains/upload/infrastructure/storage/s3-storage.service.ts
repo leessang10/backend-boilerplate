@@ -17,12 +17,15 @@ export class S3StorageService implements IStorageService {
   private readonly logger = new Logger(S3StorageService.name);
 
   constructor(private configService: ConfigService) {
-    this.logger.warn('S3StorageService is a stub. Implement S3 integration for production use.');
+    this.logger.warn(
+      'S3StorageService is a stub. Implement S3 integration for production use.',
+    );
   }
 
-  async upload(file: Express.Multer.File): Promise<UploadedFile> {
+  upload(file: Express.Multer.File): Promise<UploadedFile> {
     const ext = path.extname(file.originalname);
-    const fileName = `${uuidv4()}${ext}`;
+    const _fileName = `${uuidv4()}${ext}`;
+    void _fileName;
 
     // TODO: Implement S3 upload
     // const s3Client = new S3Client({ region: this.configService.get('AWS_REGION') });
@@ -34,12 +37,14 @@ export class S3StorageService implements IStorageService {
     // });
     // await s3Client.send(command);
 
-    throw new Error('S3 upload not implemented');
+    return Promise.reject(new Error('S3 upload not implemented'));
   }
 
-  async delete(fileName: string): Promise<void> {
+  delete(fileName: string): Promise<void> {
     // TODO: Implement S3 delete
-    throw new Error('S3 delete not implemented');
+    return Promise.reject(
+      new Error(`S3 delete not implemented for file: ${fileName}`),
+    );
   }
 
   getFileUrl(fileName: string): string {
@@ -47,8 +52,9 @@ export class S3StorageService implements IStorageService {
     return `https://your-bucket.s3.amazonaws.com/${fileName}`;
   }
 
-  async exists(fileName: string): Promise<boolean> {
+  exists(fileName: string): Promise<boolean> {
     // TODO: Implement S3 exists check
-    return false;
+    void fileName;
+    return Promise.resolve(false);
   }
 }

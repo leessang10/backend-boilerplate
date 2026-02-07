@@ -43,8 +43,8 @@ export default tseslint.config(
   },
   {
     files: [
-      'src/domains/{auth,user}/{application,domain,presentation}/**/*.ts',
-      'src/domains/{auth,user}/*.module.ts',
+      'src/domains/{auth,user,audit,feature-flag,health,metrics,streaming,upload,websocket}/{application,domain,presentation}/**/*.ts',
+      'src/domains/{auth,user,audit,feature-flag,health,metrics,streaming,upload,websocket}/*.module.ts',
     ],
     rules: {
       'no-restricted-imports': [
@@ -79,7 +79,6 @@ export default tseslint.config(
       'src/core/**/*.ts',
       'src/config/**/*.ts',
       'src/infra/**/*.ts',
-      'src/domains/{audit,feature-flag,health,metrics,streaming,upload,websocket}/**/*.ts',
       'test/**/*.ts',
     ],
     rules: {
@@ -107,7 +106,6 @@ export default tseslint.config(
     files: [
       'src/*.ts',
       'src/{common,core,config,infra,shared}/**/*.ts',
-      'src/domains/{audit,feature-flag,health,metrics,streaming,upload,websocket}/**/*.ts',
       'test/**/*.ts',
     ],
     rules: {

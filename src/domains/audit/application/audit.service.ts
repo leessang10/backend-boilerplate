@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from '@infra/prisma/prisma.service';
 import { PaginationMeta } from '../../../shared/interfaces/response.interface';
+import { AUDIT_LOG_REPOSITORY_PORT } from '../domain/ports/audit-log.repository.port';
+import type { AuditLogRepositoryPort } from '../domain/ports/audit-log.repository.port';
 
 interface QueryAuditDto {
   page: number;
@@ -13,7 +14,10 @@ interface QueryAuditDto {
 
 @Injectable()
 export class AuditService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @Inject(AUDIT_LOG_REPOSITORY_PORT)
+    private readonly auditLogRepository: AuditLogRepositoryPort,
+  ) {}
 
   async findAll(query: QueryAuditDto) {
     const { page = 1, limit = 50, userId, action, entity } = query;
@@ -34,26 +38,8 @@ export class AuditService {
       where.entity = entity;
     }
 
-    // Get total count
-    const total = await this.prisma.auditLog.count({ where });
-
-    // Get audit logs
-    const logs = await this.prisma.auditLog.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
-    });
+    const total = await this.auditLogRepository.count(where);
+    const logs = await this.auditLogRepository.findMany(where, skip, limit);
 
     // Build pagination meta
     const totalPages = Math.ceil(total / limit);
@@ -73,19 +59,7 @@ export class AuditService {
   }
 
   async findOne(id: string) {
-    const log = await this.prisma.auditLog.findUnique({
-      where: { id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
-    });
+    const log = await this.auditLogRepository.findById(id);
 
     if (!log) {
       throw new NotFoundException('Audit log not found');
@@ -95,10 +69,6 @@ export class AuditService {
   }
 
   async findByUser(userId: string) {
-    return this.prisma.auditLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    return this.auditLogRepository.findByUser(userId);
   }
 }
