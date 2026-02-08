@@ -12,7 +12,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthService } from '@domains/auth';
+import { AuthService } from '../application/auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Public } from '@shared/decorators/public.decorator';

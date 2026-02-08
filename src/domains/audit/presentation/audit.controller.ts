@@ -5,7 +5,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuditService } from '@domains/audit';
+import { AuditService } from '@domains/audit/application/audit.service';
 import { Roles } from '@shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 

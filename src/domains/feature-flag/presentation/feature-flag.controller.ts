@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FeatureFlagService } from '@domains/feature-flag';
+import { FeatureFlagService } from '../application/feature-flag.service';
 import { Roles } from '@shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';

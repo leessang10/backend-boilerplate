@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { FeatureFlagService } from '@domains/feature-flag';
+import { FeatureFlagService } from '../../application/feature-flag.service';
 
 export const FEATURE_FLAG_KEY = 'featureFlag';
 
