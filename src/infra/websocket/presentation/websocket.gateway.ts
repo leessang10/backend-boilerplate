@@ -15,7 +15,7 @@ import { WsJwtGuard } from '../infrastructure/guards/ws-jwt.guard';
 import { CurrentUser } from '@shared/decorators/current-user.decorator';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
 import type { Gauge } from 'prom-client';
-import type { WsUser } from '@domains/websocket';
+import type { WsUser } from '@infra/websocket';
 
 interface AuthenticatedSocket extends Socket {
   user?: WsUser;

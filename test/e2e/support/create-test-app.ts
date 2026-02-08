@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../../src/app/app.module';
+import { AppModule } from '../../../src/app.module';
 import { InfraModule } from '../../../src/infra/infra.module';
 import { PrismaModule } from '../../../src/infra/prisma/prisma.module';
 import { CacheModule } from '../../../src/infra/cache/cache.module';

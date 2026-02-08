@@ -19,7 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
-import { UploadService } from '@domains/upload/application/upload.service';
+import { UploadService } from '@infra/upload/application/upload.service';
 import { Roles } from '@shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import * as fs from 'fs';

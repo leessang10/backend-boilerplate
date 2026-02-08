@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import type { AuthJwtConfig } from '@domains/auth';
-import type { WsJwtPayload, WsUser } from '@domains/websocket';
+import type { WsJwtPayload, WsUser } from '@infra/websocket';
 
 interface AuthenticatedSocket extends Socket {
   user?: WsUser;
