@@ -91,36 +91,29 @@ test/
 
 ### Setup
 
-1. Install dependencies
-
-```bash
-pnpm install
-```
-
-2. Create env file
+1. Create env file
 
 ```bash
 cp .env.example .env
 ```
 
-3. Start local infra (PostgreSQL, Redis, monitoring stack)
+2. Full setup (install + prisma + docker)
 
 ```bash
-docker-compose up -d
+pnpm setup
+pnpm docker:up
 ```
 
-4. Prisma generate/migrate/seed
-
-```bash
-pnpm prisma:generate
-pnpm prisma:migrate
-pnpm prisma:seed
-```
-
-5. Run server
+3. Run server
 
 ```bash
 pnpm start:dev
+```
+
+Or use the combined command:
+
+```bash
+pnpm dev
 ```
 
 ### Local URLs
@@ -141,29 +134,45 @@ pnpm start:dev
 ## Scripts
 
 ```bash
+# initial setup
+pnpm setup                    # full setup: install + prisma generate + migrate + seed
+pnpm db:setup                 # db setup: generate + migrate + seed
+pnpm db:reset                 # reset db and reseed
+
+# docker (local infrastructure)
+pnpm docker:up                # start postgres, redis, prometheus, grafana
+pnpm docker:down              # stop all containers
+pnpm docker:logs              # follow logs
+pnpm docker:restart           # restart containers
+pnpm docker:clean             # stop and remove volumes
+
 # app
-pnpm start
-pnpm start:dev
-pnpm start:debug
-pnpm build
-pnpm start:prod
+pnpm dev                      # docker:up + start:dev
+pnpm start                    # production start
+pnpm start:dev                # watch mode
+pnpm start:debug              # debug mode
+pnpm build                    # build for production
+pnpm start:prod               # run production build
+pnpm clean                    # remove dist, coverage, .nest
 
 # quality
-pnpm lint
-pnpm format
+pnpm lint                     # eslint with auto-fix
+pnpm format                   # prettier format
 
 # tests
-pnpm test
-pnpm test:watch
-pnpm test:cov
-pnpm test:e2e
+pnpm test                     # unit tests
+pnpm test:watch               # watch mode
+pnpm test:cov                 # with coverage
+pnpm test:e2e                 # e2e tests
 
 # prisma
-pnpm prisma:generate
-pnpm prisma:migrate
-pnpm prisma:migrate:prod
-pnpm prisma:seed
-pnpm prisma:studio
+pnpm prisma:generate          # generate prisma client
+pnpm prisma:migrate           # create and apply migration
+pnpm prisma:migrate:prod      # apply migrations (production)
+pnpm prisma:push              # push schema without migration (dev only)
+pnpm prisma:seed              # seed database
+pnpm prisma:studio            # open prisma studio
+pnpm prisma:reset             # reset database
 ```
 
 ## Testing Notes
