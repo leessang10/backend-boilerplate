@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   UserCreatedEvent,
-  UserPasswordChangedEvent,
   UserDeletedEvent,
+  UserPasswordChangedEvent,
 } from '@domains/user';
 import { QueueService } from '../../queue/queue.service';
 

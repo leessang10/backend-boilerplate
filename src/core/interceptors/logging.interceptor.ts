@@ -1,13 +1,13 @@
 import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
   CallHandler,
+  ExecutionContext,
+  Injectable,
   Logger,
+  NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { MaskUtil } from '../../shared/utils/mask.util';
+import { MaskUtil } from '@shared/utils/mask.util';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {

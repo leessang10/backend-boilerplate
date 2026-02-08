@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import {
-  PrometheusModule,
   makeCounterProvider,
-  makeHistogramProvider,
   makeGaugeProvider,
+  makeHistogramProvider,
+  PrometheusModule,
 } from '@willsoto/nestjs-prometheus';
 import { MetricsController } from './presentation/metrics.controller';
 

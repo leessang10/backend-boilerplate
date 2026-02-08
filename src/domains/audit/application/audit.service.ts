@@ -1,8 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PaginationMeta } from '../../../shared/interfaces/response.interface';
-import { AUDIT_LOG_REPOSITORY_PORT } from '../domain/ports/audit-log.repository.port';
+import { PaginationMeta } from '@shared/interfaces/response.interface';
 import type { AuditLogRepositoryPort } from '../domain/ports/audit-log.repository.port';
+import { AUDIT_LOG_REPOSITORY_PORT } from '../domain/ports/audit-log.repository.port';
 
 interface QueryAuditDto {
   page: number;

@@ -8,14 +8,14 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { User } from '@prisma/client';
-import { USER_READER_PORT, UserResponseDto } from '@domains/user';
 import type { UserReaderPort } from '@domains/user';
+import { USER_READER_PORT, UserResponseDto } from '@domains/user';
 import { LoginDto } from '../presentation/dto/login.dto';
 import { AuthResponseDto } from '../presentation/dto/auth-response.dto';
-import { UserLoginEvent, UserLogoutEvent } from '../domain/events/auth.events';
-import type { AuthJwtConfig } from '../domain/types/jwt-config.type';
+import { UserLoginEvent, UserLogoutEvent } from '@domains/auth';
+import type { AuthJwtConfig } from '@domains/auth';
 import * as argon2 from 'argon2';
-import { CryptoService } from '../../../shared/crypto/crypto.service';
+import { CryptoService } from '@shared/crypto/crypto.service';
 import { AuthRepository } from '../infrastructure/auth.repository';
 
 export interface JwtPayload {

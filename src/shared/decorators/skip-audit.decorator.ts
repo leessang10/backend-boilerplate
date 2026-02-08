@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { SKIP_AUDIT } from '../../core/interceptors/audit.interceptor';
+import { SKIP_AUDIT } from '@core/interceptors/audit.interceptor';
 
 /**
  * Decorator to skip audit logging for a specific route

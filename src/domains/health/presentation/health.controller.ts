@@ -1,14 +1,14 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import {
+  DiskHealthIndicator,
   HealthCheck,
   HealthCheckService,
   MemoryHealthIndicator,
-  DiskHealthIndicator,
 } from '@nestjs/terminus';
 import { parse } from 'node:path';
-import { Public } from '../../../shared/decorators/public.decorator';
-import { DATABASE_HEALTH_PORT } from '../domain/ports/database-health.port';
+import { Public } from '@shared/decorators/public.decorator';
 import type { DatabaseHealthPort } from '../domain/ports/database-health.port';
+import { DATABASE_HEALTH_PORT } from '../domain/ports/database-health.port';
 
 @Controller({ path: 'health', version: '1' })
 export class HealthController {

@@ -1,21 +1,21 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
   HttpCode,
   HttpStatus,
+  Post,
   Req,
 } from '@nestjs/common';
 import {
-  ApiTags,
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
+  ApiTags,
 } from '@nestjs/swagger';
-import { AuthService } from '../application/auth.service';
+import { AuthService } from '@domains/auth';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { Public } from '../../../shared/decorators/public.decorator';
+import { Public } from '@shared/decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller({ path: 'auth', version: '1' })

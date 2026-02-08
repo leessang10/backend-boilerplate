@@ -1,13 +1,13 @@
 import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
   CallHandler,
+  ExecutionContext,
+  Injectable,
   Logger,
+  NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { PrismaService } from '../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 import { Reflector } from '@nestjs/core';
 
 export const SKIP_AUDIT = 'skipAudit';

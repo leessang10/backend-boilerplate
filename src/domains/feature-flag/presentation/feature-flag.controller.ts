@@ -1,15 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Patch,
-  Param,
   Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { FeatureFlagService } from '../application/feature-flag.service';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FeatureFlagService } from '@domains/feature-flag';
+import { Roles } from '@shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateFeatureFlagDto } from './dto/create-feature-flag.dto';
 

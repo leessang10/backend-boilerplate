@@ -1,9 +1,9 @@
 import {
   IsEmail,
+  IsEnum,
+  IsOptional,
   IsString,
   MinLength,
-  IsOptional,
-  IsEnum,
 } from 'class-validator';
 import { Role } from '@prisma/client';
 

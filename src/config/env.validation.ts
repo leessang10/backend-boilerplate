@@ -12,7 +12,7 @@ const envSchema = z.object({
     .pipe(z.number().positive()),
 
   // Database
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.url(),
 
   // Redis
   REDIS_HOST: z.string().default('localhost'),

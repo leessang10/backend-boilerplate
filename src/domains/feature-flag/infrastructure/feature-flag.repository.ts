@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FeatureFlag } from '@prisma/client';
-import { PrismaService } from '../../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 import {
   CreateFeatureFlagInput,
   FeatureFlagRepositoryPort,

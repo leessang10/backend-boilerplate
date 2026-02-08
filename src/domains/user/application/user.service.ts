@@ -1,24 +1,24 @@
 import {
-  Injectable,
-  NotFoundException,
   ConflictException,
+  Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CryptoService } from '../../../shared/crypto/crypto.service';
+import { CryptoService } from '@shared/crypto/crypto.service';
 import { CreateUserDto } from '../presentation/dto/create-user.dto';
 import { UpdateUserDto } from '../presentation/dto/update-user.dto';
 import { QueryUserDto } from '../presentation/dto/query-user.dto';
-import { UserResponseDto } from '../presentation/dto/user-response.dto';
-import { PaginationMeta } from '../../../shared/interfaces/response.interface';
+import { UserResponseDto } from '@domains/user';
+import { PaginationMeta } from '@shared/interfaces/response.interface';
 import {
   UserCreatedEvent,
-  UserUpdatedEvent,
   UserDeletedEvent,
-} from '../domain/events/user.events';
+  UserUpdatedEvent,
+} from '@domains/user';
 import { UserRepository } from '../infrastructure/user.repository';
-import { UserReaderPort } from '../domain/ports/user-reader.port';
+import { UserReaderPort } from '@domains/user';
 import * as argon2 from 'argon2';
 
 @Injectable()

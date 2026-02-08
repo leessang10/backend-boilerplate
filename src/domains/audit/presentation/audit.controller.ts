@@ -1,12 +1,12 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
   ApiBearerAuth,
+  ApiOperation,
   ApiQuery,
+  ApiTags,
 } from '@nestjs/swagger';
-import { AuditService } from '../application/audit.service';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { AuditService } from '@domains/audit';
+import { Roles } from '@shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @ApiTags('Audit')

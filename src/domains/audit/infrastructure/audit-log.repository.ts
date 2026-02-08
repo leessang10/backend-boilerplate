@@ -4,7 +4,7 @@ import {
   AuditLogRepositoryPort,
   AuditLogWithUser,
 } from '../domain/ports/audit-log.repository.port';
-import { PrismaService } from '../../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 
 @Injectable()
 export class AuditLogRepository implements AuditLogRepositoryPort {

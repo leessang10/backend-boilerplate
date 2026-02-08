@@ -1,19 +1,19 @@
 import {
+  BadRequestException,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Res,
-  NotFoundException,
-  BadRequestException,
   Sse,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { Public } from '../../../shared/decorators/public.decorator';
+import { Public } from '@shared/decorators/public.decorator';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Observable, interval, map } from 'rxjs';
+import { interval, map, Observable } from 'rxjs';
 
 interface MessageEvent {
   data: string | object;

@@ -1,20 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import {
   RequestMethod,
-  VERSION_NEUTRAL,
   ValidationPipe,
+  VERSION_NEUTRAL,
   VersioningType,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import { AppModule } from './app/app.module';
-import { HttpExceptionFilter } from './core/filters/http-exception.filter';
-import { TransformInterceptor } from './core/interceptors/transform.interceptor';
-import { RequestIdMiddleware } from './core/middlewares/request-id.middleware';
-import { IdempotencyMiddleware } from './core/middlewares/idempotency.middleware';
-import { PrismaService } from './infra/prisma/prisma.service';
+import { AppModule } from '@app/app.module';
+import { HttpExceptionFilter } from '@core/filters/http-exception.filter';
+import { TransformInterceptor } from '@core/interceptors/transform.interceptor';
+import { RequestIdMiddleware } from '@core/middlewares/request-id.middleware';
+import { IdempotencyMiddleware } from '@core/middlewares/idempotency.middleware';
+import { PrismaService } from '@infra/prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

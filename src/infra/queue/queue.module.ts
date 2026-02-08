@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getBullConfig } from '../../config/bull.config';
+import { getBullConfig } from '@config/bull.config';
 import { EmailProcessor } from './processors/email.processor';
 import { QueueService } from './queue.service';
 import { QUEUE_NAMES } from './queue.constants';

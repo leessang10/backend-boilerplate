@@ -1,8 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { FEATURE_FLAG_CACHE_PORT } from '../domain/ports/feature-flag-cache.port';
 import type { FeatureFlagCachePort } from '../domain/ports/feature-flag-cache.port';
-import { FEATURE_FLAG_REPOSITORY_PORT } from '../domain/ports/feature-flag-repository.port';
+import { FEATURE_FLAG_CACHE_PORT } from '../domain/ports/feature-flag-cache.port';
 import type { FeatureFlagRepositoryPort } from '../domain/ports/feature-flag-repository.port';
+import { FEATURE_FLAG_REPOSITORY_PORT } from '../domain/ports/feature-flag-repository.port';
 
 @Injectable()
 export class FeatureFlagService {

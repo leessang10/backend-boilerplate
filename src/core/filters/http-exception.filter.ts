@@ -1,14 +1,14 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ApiResponse } from '../../shared/interfaces/response.interface';
-import { ErrorCode, ERROR_MESSAGES } from '../../shared/constants/error-codes';
+import { ApiResponse } from '@shared/interfaces/response.interface';
+import { ERROR_MESSAGES, ErrorCode } from '@shared/constants/error-codes';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

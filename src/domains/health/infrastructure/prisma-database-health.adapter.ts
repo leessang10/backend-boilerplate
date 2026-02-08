@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HealthIndicatorResult, PrismaHealthIndicator } from '@nestjs/terminus';
 import { DatabaseHealthPort } from '../domain/ports/database-health.port';
-import { PrismaService } from '../../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 
 @Injectable()
 export class PrismaDatabaseHealthAdapter implements DatabaseHealthPort {

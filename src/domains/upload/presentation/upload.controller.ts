@@ -1,26 +1,26 @@
 import {
+  BadRequestException,
   Controller,
-  Post,
   Delete,
+  Get,
   Param,
-  UseInterceptors,
+  Post,
+  Res,
   UploadedFile,
   UploadedFiles,
-  BadRequestException,
-  Get,
-  Res,
+  UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiConsumes,
-  ApiBody,
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
-import { UploadService } from '../application/upload.service';
-import { Roles } from '../../../shared/decorators/roles.decorator';
+import { UploadService } from '@domains/upload';
+import { Roles } from '@shared/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';

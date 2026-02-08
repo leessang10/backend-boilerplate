@@ -1,11 +1,11 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { FeatureFlagService } from '../../application/feature-flag.service';
+import { FeatureFlagService } from '@domains/feature-flag';
 
 export const FEATURE_FLAG_KEY = 'featureFlag';
 
