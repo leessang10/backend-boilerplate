@@ -226,6 +226,60 @@ Important keys:
 - `THROTTLE_TTL`, `THROTTLE_LIMIT`
 - `UPLOAD_DEST`, `UPLOAD_MAX_FILE_SIZE`
 
+## Production Deployment
+
+### Graceful Shutdown
+
+The application implements graceful shutdown for zero-downtime deployments:
+
+- **Signal Handling**: Responds to SIGTERM/SIGINT (Kubernetes/Docker)
+- **Queue Draining**: Waits for active Bull jobs to complete (20s timeout)
+- **Connection Cleanup**: Closes WebSocket, Redis, and database connections
+- **Health Checks**: Readiness probe fails immediately on shutdown
+- **Timeout Protection**: Forces exit after 30 seconds
+
+**Configuration:**
+
+```env
+SHUTDOWN_TIMEOUT=30000          # Total shutdown timeout (ms)
+QUEUE_DRAIN_TIMEOUT=20000       # Queue job completion timeout (ms)
+WEBSOCKET_CLOSE_TIMEOUT=5000    # WebSocket close timeout (ms)
+```
+
+**Kubernetes Configuration:**
+
+Set `terminationGracePeriodSeconds: 35` (5s buffer over timeout):
+
+```yaml
+spec:
+  terminationGracePeriodSeconds: 35
+  containers:
+  - name: app
+    env:
+    - name: SHUTDOWN_TIMEOUT
+      value: "30000"
+    livenessProbe:
+      httpGet:
+        path: /v1/health/live
+        port: 3000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /v1/health/ready
+        port: 3000
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      failureThreshold: 2
+```
+
+**Docker:**
+
+```bash
+# Stop with grace period (default 10s, recommend 30s+)
+docker stop --time=35 <container>
+```
+
 ## Architecture and Boundaries
 
 - Use domain public APIs (`@domains/<name>`) rather than deep imports.

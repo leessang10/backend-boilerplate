@@ -65,6 +65,23 @@ const envSchema = z.object({
 
   // Bull Queue
   BULL_BOARD_PATH: z.string().default('/admin/queues'),
+
+  // Graceful Shutdown
+  SHUTDOWN_TIMEOUT: z
+    .string()
+    .default('30000')
+    .transform(Number)
+    .pipe(z.number().positive()),
+  QUEUE_DRAIN_TIMEOUT: z
+    .string()
+    .default('20000')
+    .transform(Number)
+    .pipe(z.number().positive()),
+  WEBSOCKET_CLOSE_TIMEOUT: z
+    .string()
+    .default('5000')
+    .transform(Number)
+    .pipe(z.number().positive()),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

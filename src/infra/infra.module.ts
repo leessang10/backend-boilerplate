@@ -11,9 +11,11 @@ import { UploadModule } from '@infra/upload';
 import { StreamingModule } from '@infra/streaming';
 import { AuditModule } from '@infra/audit';
 import { WebsocketModule } from '@infra/websocket';
+import { ShutdownModule } from '@infra/shutdown';
 
 @Module({
   imports: [
+    ShutdownModule,
     PrismaModule,
     CacheModule,
     QueueModule,
@@ -28,6 +30,7 @@ import { WebsocketModule } from '@infra/websocket';
     WebsocketModule,
   ],
   exports: [
+    ShutdownModule,
     PrismaModule,
     CacheModule,
     QueueModule,

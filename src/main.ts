@@ -21,6 +21,9 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  // Enable shutdown hooks for OnModuleDestroy lifecycle
+  app.enableShutdownHooks();
+
   // Apply request ID middleware
   const requestIdMiddleware = new RequestIdMiddleware();
   app.use((req, res, next) => requestIdMiddleware.use(req, res, next));
@@ -127,13 +130,12 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  const apiBaseUrl = `http://localhost:${port}/api`;
-  console.log(`🚀 Application is running on: ${apiBaseUrl}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api-docs`);
-  console.log(`💚 Health Check: http://localhost:${port}/v1/health`);
-  console.log(`🧰 Bull Board: http://localhost:${port}/admin/queues`);
-  console.log(`📈 Prometheus: http://localhost:${port}/metrics`);
-  console.log(`📚 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Application is running on: http://localhost:${port}/api`);
+  console.log(`API Documentation: http://localhost:${port}/api-docs`);
+  console.log(`Health Check: http://localhost:${port}/v1/health`);
+  console.log(`Bull Board: http://localhost:${port}/admin/queues`);
+  console.log(`Prometheus: http://localhost:${port}/metrics`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 }
 
 void bootstrap();

@@ -1,4 +1,9 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import {
   DiskHealthIndicator,
   HealthCheck,
@@ -9,6 +14,7 @@ import { parse } from 'node:path';
 import { Public } from '@shared/decorators/public.decorator';
 import type { DatabaseHealthPort } from '../domain/ports/database-health.port';
 import { DATABASE_HEALTH_PORT } from '../domain/ports/database-health.port';
+import { ShutdownService } from '@infra/shutdown/shutdown.service';
 
 @Controller({ path: 'health', version: '1' })
 export class HealthController {
@@ -20,12 +26,19 @@ export class HealthController {
     private readonly disk: DiskHealthIndicator,
     @Inject(DATABASE_HEALTH_PORT)
     private readonly databaseHealth: DatabaseHealthPort,
+    private readonly shutdownService: ShutdownService,
   ) {}
 
   @Public()
   @Get('ready')
   @HealthCheck()
   ready() {
+    // Fail readiness check if shutting down
+    // This prevents Kubernetes from routing new traffic to this pod
+    if (this.shutdownService.getShutdownState()) {
+      throw new ServiceUnavailableException('Server is shutting down');
+    }
+
     return this.health.check([() => this.databaseHealth.check('database')]);
   }
 

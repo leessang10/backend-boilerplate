@@ -44,6 +44,8 @@ export class WebsocketGateway
 
   afterInit() {
     this.logger.log('WebSocket Gateway initialized');
+    // Register globally for ShutdownService access
+    (global as any).websocketGateway = this;
   }
 
   handleConnection(client: AuthenticatedSocket) {
@@ -242,5 +244,41 @@ export class WebsocketGateway
    */
   getConnectedUsersCount(): number {
     return this.connectedClients.size;
+  }
+
+  /**
+   * Gracefully close all WebSocket connections
+   * Called by ShutdownService during shutdown
+   */
+  async gracefulShutdown(timeoutMs: number = 5000): Promise<void> {
+    this.logger.log(
+      `Closing ${this.connectedClients.size} WebSocket connections...`,
+    );
+
+    // Notify all clients of shutdown
+    this.server.emit('server-shutdown', {
+      message: 'Server is shutting down, please reconnect in a moment',
+      timestamp: new Date().toISOString(),
+    });
+
+    // Wait 1s for clients to receive message
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Disconnect all clients
+    const disconnectPromises = Array.from(this.connectedClients.values()).map(
+      (client) =>
+        new Promise<void>((resolve) => {
+          client.disconnect(true);
+          resolve();
+        }),
+    );
+
+    // Wait for all disconnects with timeout
+    await Promise.race([
+      Promise.all(disconnectPromises),
+      new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
+
+    this.logger.log('All WebSocket connections closed');
   }
 }

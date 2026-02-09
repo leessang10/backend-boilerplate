@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import type { Queue } from 'bull';
 import { QUEUE_NAMES } from './queue.constants';
@@ -18,7 +18,7 @@ export interface NotificationJobData {
 }
 
 @Injectable()
-export class QueueService {
+export class QueueService implements OnModuleDestroy {
   private readonly logger = new Logger(QueueService.name);
 
   constructor(
@@ -93,5 +93,43 @@ export class QueueService {
       failed,
       delayed,
     };
+  }
+
+  /**
+   * Gracefully close all queues during shutdown
+   * Waits for active jobs to complete before closing
+   */
+  async onModuleDestroy() {
+    this.logger.log('Closing Bull queues gracefully...');
+
+    await Promise.all([
+      this.closeQueue(this.emailQueue, QUEUE_NAMES.EMAIL),
+      this.closeQueue(this.notificationQueue, QUEUE_NAMES.NOTIFICATION),
+    ]);
+
+    this.logger.log('All Bull queues closed');
+  }
+
+  /**
+   * Close individual queue and wait for active jobs
+   */
+  private async closeQueue(queue: Queue, name: string): Promise<void> {
+    try {
+      const activeCount = await queue.getActiveCount();
+      if (activeCount > 0) {
+        this.logger.log(
+          `Waiting for ${activeCount} active job(s) in ${name} queue...`,
+        );
+      }
+
+      // queue.close() waits for active jobs to complete
+      await queue.close();
+      this.logger.log(`${name} queue closed`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to close ${name} queue: ${error.message}`,
+        error.stack,
+      );
+    }
   }
 }
