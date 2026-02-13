@@ -76,8 +76,6 @@ async function bootstrap() {
       { path: 'admin/queues/*path', method: RequestMethod.ALL },
       { path: 'health', method: RequestMethod.ALL },
       { path: 'health/*path', method: RequestMethod.ALL },
-      { path: 'v1/health', method: RequestMethod.ALL },
-      { path: 'v1/health/*path', method: RequestMethod.ALL },
     ],
   });
 
